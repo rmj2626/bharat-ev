@@ -4,7 +4,7 @@ import VehicleSpecItem from "./vehicle-spec-item";
 import { VehicleWithDetails } from "@shared/types";
 import { useComparison } from "../hooks/use-comparison";
 import { formatPrice } from "../lib/filterHelpers";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, Battery, Gauge, Clock, Zap } from "lucide-react";
 
 interface VehicleCardProps {
   vehicle: VehicleWithDetails;
@@ -14,145 +14,116 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
   const { toggleVehicle, isSelected } = useComparison();
   const selected = isSelected(vehicle.id);
 
-  const getChargeTime = () => {
-    if (vehicle.fastChargingTime) {
-      return `${vehicle.fastChargingTime} min (10-80%)`;
-    }
-    return "N/A";
-  };
-
-  const getEfficiency = () => {
-    if (vehicle.efficiency) {
-      return `${vehicle.efficiency} Wh/km`;
-    }
-    return "N/A";
-  };
-
+  // Completely redesigned card with full-width image at the top
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg hover:shadow-md transition-shadow duration-300">
-      <div className="flex flex-col md:flex-row md:h-full">
-        {/* Vehicle Image - Fill entire height in desktop view without margins */}
-        <div className="relative cursor-pointer md:w-1/4 overflow-hidden" style={{ padding: 0 }}>
-          <Link href={`/vehicles/${vehicle.id}`} className="block h-full">
-            <div className="md:h-full w-full bg-gray-100" style={{ 
-              aspectRatio: '16/9', 
-              padding: 0, 
-              margin: 0, 
-              display: 'block',
-              position: 'relative' 
-            }}>
-              <img
-                src={vehicle.image || "https://www.svgrepo.com/show/508699/landscape-placeholder.svg"}
-                alt={`${vehicle.manufacturerName} ${vehicle.modelName} ${vehicle.variantName}`}
-                style={{ 
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: '100%', 
-                  height: '100%', 
-                  objectFit: 'contain'
+    <div className="bg-white shadow overflow-hidden rounded-lg hover:shadow-md transition-shadow duration-300">
+      {/* Full width image at the top */}
+      <div className="relative">
+        <Link href={`/vehicles/${vehicle.id}`} className="block">
+          <div className="w-full relative bg-gradient-to-r from-gray-50 to-gray-100" style={{ height: '240px' }}>
+            <img
+              src={vehicle.image || "https://www.svgrepo.com/show/508699/landscape-placeholder.svg"}
+              alt={`${vehicle.manufacturerName} ${vehicle.modelName} ${vehicle.variantName}`}
+              className="w-full h-full object-contain"
+            />
+            {/* Add comparison checkbox */}
+            <div className="absolute top-3 right-3 z-10">
+              <div
+                className={`h-7 w-7 rounded-sm border-2 ${
+                  selected 
+                    ? 'bg-blue-500 border-blue-600' 
+                    : 'bg-white/80 border-gray-300 hover:border-blue-400'
+                } flex items-center justify-center cursor-pointer transition-colors duration-200 shadow-md`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleVehicle(vehicle);
                 }}
-              />
+                aria-label={`${selected ? 'Remove from' : 'Add to'} comparison`}
+              >
+                {selected && (
+                  <CheckIcon className="h-5 w-5 text-white" />
+                )}
+              </div>
             </div>
-          </Link>
-          <div className="absolute top-2 right-2">
-            <div
-              className={`h-6 w-6 rounded-sm border ${
-                selected 
-                  ? 'bg-blue-500 border-blue-600' 
-                  : 'bg-white border-gray-300 hover:border-blue-400'
-              } flex items-center justify-center cursor-pointer transition-colors duration-200`}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleVehicle(vehicle);
-              }}
-              aria-label={`${selected ? 'Remove from' : 'Add to'} comparison`}
-            >
-              {selected && (
-                <CheckIcon className="h-4 w-4 text-white" />
-              )}
-            </div>
+          </div>
+        </Link>
+      </div>
+
+      {/* Vehicle header info */}
+      <div className="px-4 pt-4 pb-2">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-start">
+          <div>
+            <Link href={`/vehicles/${vehicle.id}`}>
+              <h2 className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
+                {vehicle.manufacturerName} {vehicle.modelName} {vehicle.variantName}
+              </h2>
+            </Link>
+            <p className="text-sm text-gray-500 mt-1">
+              {vehicle.bodyStyleName} • {vehicle.manufacturingStartYear}
+              {vehicle.manufacturingEndYear ? `-${vehicle.manufacturingEndYear}` : ""}
+            </p>
+          </div>
+          <div className="mt-2 md:mt-0 inline-flex md:flex-col items-center md:items-end">
+            <span className="text-xl font-semibold text-gray-900">
+              {formatPrice(vehicle.price)}
+            </span>
+            <span className="ml-2 md:ml-0 text-sm text-gray-500">Ex-showroom</span>
           </div>
         </div>
+      </div>
 
-        {/* Vehicle Details */}
-        <div className="flex-1 p-4 md:p-6">
-          <div className="flex flex-col md:flex-row md:justify-between">
-            <div>
-              <Link href={`/vehicles/${vehicle.id}`}>
-                <h2 className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
-                  {vehicle.manufacturerName} {vehicle.modelName} {vehicle.variantName}
-                </h2>
-              </Link>
-              <p className="text-sm text-gray-500 mb-4">
-                {vehicle.bodyStyleName} • {vehicle.manufacturingStartYear}
-                {vehicle.manufacturingEndYear ? `-${vehicle.manufacturingEndYear}` : ""}
-              </p>
-            </div>
-            <div className="mt-2 md:mt-0 inline-flex md:flex-col items-center md:items-end">
-              <span className="text-xl font-semibold text-gray-900">
-                {formatPrice(vehicle.price)}
-              </span>
-              <span className="ml-2 md:ml-0 text-sm text-gray-500">Ex-showroom</span>
-            </div>
-          </div>
-
-          {/* First row: Real Range, Battery, Charging Time, Efficiency, Battery Type */}
-          <div className="mt-4 grid grid-cols-5 gap-2 text-xs sm:text-sm">
+      {/* Key specs with icons - simplified for better readability */}
+      <div className="px-4 py-3 border-t border-gray-100">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="flex items-center gap-2">
+            <Gauge size={18} className="text-blue-600" />
             <VehicleSpecItem 
               label="Real Range" 
               value={vehicle.realWorldRange ? `${vehicle.realWorldRange} km` : "N/A"} 
             />
+          </div>
+          <div className="flex items-center gap-2">
+            <Battery size={18} className="text-blue-600" />
             <VehicleSpecItem 
               label="Battery" 
               value={vehicle.batteryCapacity ? `${vehicle.batteryCapacity} kWh` : "N/A"} 
             />
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock size={18} className="text-blue-600" />
             <VehicleSpecItem 
-              label="Charging Time" 
-              value={getChargeTime()} 
-            />
-            <VehicleSpecItem 
-              label="Efficiency" 
-              value={getEfficiency()} 
-            />
-            <VehicleSpecItem 
-              label="Battery Type" 
-              value={vehicle.batteryTypeName || "N/A"} 
+              label="Fast Charging" 
+              value={vehicle.fastChargingTime ? `${vehicle.fastChargingTime} min` : "N/A"} 
             />
           </div>
-
-          {/* Second row: Power, Torque, 0-100 km/h, Top Speed, Weight */}
-          <div className="mt-3 grid grid-cols-5 gap-2 text-xs sm:text-sm">
+          <div className="flex items-center gap-2">
+            <Zap size={18} className="text-blue-600" />
             <VehicleSpecItem 
               label="Power" 
               value={vehicle.horsepower ? `${vehicle.horsepower} BHP` : "N/A"} 
             />
-            <VehicleSpecItem 
-              label="Torque" 
-              value={vehicle.torque ? `${vehicle.torque} Nm` : "N/A"} 
-            />
-            <VehicleSpecItem 
-              label="0-100 km/h" 
-              value={vehicle.acceleration ? `${vehicle.acceleration} sec` : "N/A"} 
-            />
-            <VehicleSpecItem 
-              label="Top Speed" 
-              value={vehicle.topSpeed ? `${vehicle.topSpeed} km/h` : "N/A"} 
-            />
-            <VehicleSpecItem 
-              label="Weight" 
-              value={vehicle.weight ? `${vehicle.weight} kg` : "N/A"} 
-            />
           </div>
+        </div>
+      </div>
 
-          <div className="mt-4 flex w-full">
-            <Link 
-              href={`/vehicles/${vehicle.id}`}
-              className="w-full md:w-auto inline-flex justify-center md:justify-start items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            >
-              View Details
-            </Link>
+      {/* Secondary specs row */}
+      <div className="px-4 py-3 border-t border-gray-100">
+        <div className="flex flex-wrap justify-between items-center">
+          <div className="flex gap-3 text-sm">
+            <span className="text-gray-600">
+              {vehicle.efficiency ? `${vehicle.efficiency} Wh/km` : ""}
+            </span>
+            <span className="text-gray-600">
+              {vehicle.acceleration ? `0-100: ${vehicle.acceleration}s` : ""}
+            </span>
           </div>
+          
+          <Link 
+            href={`/vehicles/${vehicle.id}`}
+            className="mt-2 md:mt-0 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+          >
+            View Details
+          </Link>
         </div>
       </div>
     </div>
