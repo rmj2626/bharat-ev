@@ -607,15 +607,6 @@ export class DatabaseStorage implements IStorage {
       case 'torque':
         orderBy = sql` ORDER BY v.torque DESC`;
         break;
-      case 'long_distance_rating':
-        // Sort by usableBatteryCapacity and fastChargingTime when both are available
-        // Higher battery capacity and faster charging = better for long distance
-        orderBy = sql` ORDER BY 
-          CASE WHEN v.usable_battery_capacity IS NOT NULL AND v.fast_charging_time IS NOT NULL 
-            THEN (v.usable_battery_capacity / NULLIF(v.fast_charging_time, 0)) 
-            ELSE 0 
-          END DESC`;
-        break;
       default:
         orderBy = sql` ORDER BY cm.view_count DESC`;
     }

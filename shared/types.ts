@@ -76,8 +76,7 @@ export const vehicleFilterSchema = z.object({
     'cost_per_km',
     'charging_fast',
     'horsepower',
-    'torque',
-    'long_distance_rating'
+    'torque'
   ]).optional().default('popular'),
   
   // Pagination
