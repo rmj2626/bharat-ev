@@ -134,9 +134,12 @@ export function ChargingTab({ vehicle }: TabProps) {
     }
   };
 
+  // First check if the vehicle has fast charging capability
+  const hasFastCharging = vehicle.fastChargingCapacity !== null;
+  
   // Calculate Average DC Fast Charging Speed (10-80%)
   const getAvgDCFastChargingSpeed = () => {
-    if (!vehicle.usableBatteryCapacity || !vehicle.fastChargingTime) return "N/A";
+    if (!hasFastCharging || !vehicle.usableBatteryCapacity || !vehicle.fastChargingTime) return "N/A";
     
     // (Useable Capacity (kWh) * 0.70) / (10-80 time (minutes) / 60)
     const avgSpeed = (vehicle.usableBatteryCapacity * 0.70) / (vehicle.fastChargingTime / 60);
@@ -145,7 +148,7 @@ export function ChargingTab({ vehicle }: TabProps) {
   
   // Calculate 10-80% range added
   const get1080RangeAdded = () => {
-    if (!vehicle.realWorldRange) return "";
+    if (!hasFastCharging || !vehicle.realWorldRange) return "";
     
     // Real Range (km) * 0.70
     const rangeAdded = vehicle.realWorldRange * 0.70;
@@ -154,7 +157,7 @@ export function ChargingTab({ vehicle }: TabProps) {
   
   // Calculate Range Added per Minute of DC Fast Charging
   const getRangePerMinute = () => {
-    if (!vehicle.usableBatteryCapacity || !vehicle.fastChargingTime || !vehicle.efficiency || !vehicle.realWorldRange) 
+    if (!hasFastCharging || !vehicle.usableBatteryCapacity || !vehicle.fastChargingTime || !vehicle.efficiency || !vehicle.realWorldRange) 
       return "N/A";
     
     // Calculate average charging speed in kW
@@ -206,6 +209,24 @@ export function ChargingTab({ vehicle }: TabProps) {
 }
 
 export function LongDistanceRatingTab({ vehicle }: TabProps) {
+  // First check if the vehicle has fast charging capability
+  const hasFastCharging = vehicle.fastChargingCapacity !== null;
+  
+  // If vehicle doesn't support fast charging, display appropriate message
+  if (!hasFastCharging) {
+    return (
+      <div className="mt-8">
+        <div className="bg-amber-50 border border-amber-100 rounded-md p-4">
+          <h3 className="text-base font-medium text-amber-800 mb-2">No Fast Charging Support</h3>
+          <p className="text-sm text-amber-700">
+            This vehicle does not support DC fast charging, which means it's not suitable for long-distance travel
+            with charging stops. The vehicle's total range on a single charge is approximately {vehicle.realWorldRange || 'N/A'} km.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
   const metrics = calculateLongDistanceMetrics(
     vehicle.realWorldRange,
     vehicle.fastChargingTime,
