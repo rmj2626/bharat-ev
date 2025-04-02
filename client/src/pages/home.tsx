@@ -81,6 +81,13 @@ export default function Home() {
           />
         </div>
 
+        {/* Results count - visual connection between filter and results */}
+        <div className="py-3 px-6 bg-gray-100 border-b border-gray-200 flex justify-between items-center">
+          <div className="text-sm font-medium text-gray-700">
+            <span>{vehiclesData?.pagination?.total || 0}</span> results found
+          </div>
+        </div>
+
         {/* Results Section - Slightly inset with subtle shadow */}
         <div className="bg-gray-50 p-4">
           {/* Loading State */}

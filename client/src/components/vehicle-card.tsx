@@ -31,14 +31,14 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg hover:shadow-md transition-shadow duration-300">
       <div className="flex flex-col md:flex-row">
-        {/* Vehicle Image - Height matches card height with small margins */}
-        <div className="md:w-1/4 bg-gray-200 relative cursor-pointer md:flex items-center">
-          <Link href={`/vehicles/${vehicle.id}`}>
-            <div className="relative w-full h-full p-1 md:py-2">
+        {/* Vehicle Image - Aspect ratio for mobile, 1/4 width for desktop */}
+        <div className="relative cursor-pointer md:w-1/4 md:h-auto">
+          <Link href={`/vehicles/${vehicle.id}`} className="block">
+            <div className="pb-[60%] md:pb-0 md:h-full relative">
               <img
                 src={vehicle.image || "https://www.svgrepo.com/show/508699/landscape-placeholder.svg"}
                 alt={`${vehicle.manufacturerName} ${vehicle.modelName} ${vehicle.variantName}`}
-                className="w-full h-full object-contain" 
+                className="absolute inset-0 w-full h-full object-cover md:static"
               />
             </div>
           </Link>
