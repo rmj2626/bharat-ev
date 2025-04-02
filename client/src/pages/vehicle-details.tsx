@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VehicleSpecItem from "@/components/vehicle-spec-item";
 import { 
   RangeEstimatorTab, 
+  LongDistanceRatingTab,
   BatteryTab, 
   PerformanceTab, 
   ChargingTab, 
@@ -232,14 +233,18 @@ export default function VehicleDetails() {
           <div className="sm:hidden">
             <Tabs defaultValue="range-estimator">
               <TabsList className="w-full">
-                <TabsTrigger value="range-estimator" className="flex-1">Range Estimator</TabsTrigger>
+                <TabsTrigger value="range-estimator" className="flex-1">Range</TabsTrigger>
+                <TabsTrigger value="long-distance" className="flex-1">Long Distance</TabsTrigger>
                 <TabsTrigger value="battery" className="flex-1">Battery</TabsTrigger>
                 <TabsTrigger value="charging" className="flex-1">Charging</TabsTrigger>
-                <TabsTrigger value="features" className="flex-1">Features</TabsTrigger>
               </TabsList>
               
               <TabsContent value="range-estimator">
                 <RangeEstimatorTab vehicle={vehicle} />
+              </TabsContent>
+              
+              <TabsContent value="long-distance">
+                <LongDistanceRatingTab vehicle={vehicle} />
               </TabsContent>
               
               <TabsContent value="battery">
@@ -249,9 +254,21 @@ export default function VehicleDetails() {
               <TabsContent value="charging">
                 <ChargingTab vehicle={vehicle} />
               </TabsContent>
+            </Tabs>
+
+            {/* Additional mobile tabs for Features */}
+            <Tabs defaultValue="features" className="mt-6">
+              <TabsList className="w-full">
+                <TabsTrigger value="features" className="flex-1">Features</TabsTrigger>
+                <TabsTrigger value="performance" className="flex-1">Performance</TabsTrigger>
+              </TabsList>
               
               <TabsContent value="features">
                 <FeaturesTab vehicle={vehicle} />
+              </TabsContent>
+              
+              <TabsContent value="performance">
+                <PerformanceTab vehicle={vehicle} />
               </TabsContent>
             </Tabs>
           </div>
@@ -262,6 +279,7 @@ export default function VehicleDetails() {
               <div className="border-b border-gray-200">
                 <TabsList className="bg-transparent">
                   <TabsTrigger value="range-estimator">Range Estimator</TabsTrigger>
+                  <TabsTrigger value="long-distance">Long Distance Rating</TabsTrigger>
                   <TabsTrigger value="battery">Battery</TabsTrigger>
                   <TabsTrigger value="charging">Charging</TabsTrigger>
                   <TabsTrigger value="features">Features</TabsTrigger>
@@ -270,6 +288,10 @@ export default function VehicleDetails() {
               
               <TabsContent value="range-estimator">
                 <RangeEstimatorTab vehicle={vehicle} />
+              </TabsContent>
+              
+              <TabsContent value="long-distance">
+                <LongDistanceRatingTab vehicle={vehicle} />
               </TabsContent>
               
               <TabsContent value="battery">
@@ -286,13 +308,7 @@ export default function VehicleDetails() {
             </Tabs>
           </div>
 
-          {/* Remaining specifications */}
-          <div className="mt-10 border-t border-gray-200 pt-6">
-            <h3 className="text-lg font-medium text-gray-900">Performance Specifications</h3>
-            <div className="mt-4">
-              <PerformanceTab vehicle={vehicle} />
-            </div>
-          </div>
+          {/* Additional information or disclaimer could go here */}
         </div>
       </div>
     </main>

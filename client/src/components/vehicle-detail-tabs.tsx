@@ -1,5 +1,6 @@
 import { VehicleWithDetails } from "@shared/types";
 import RangeEstimator from "./range-estimator";
+import { calculateLongDistanceMetrics, generateStarRating } from "@/lib/longDistanceRating";
 
 interface TabProps {
   vehicle: VehicleWithDetails;
@@ -160,6 +161,119 @@ export function ChargingTab({ vehicle }: TabProps) {
           </dd>
         </div>
       </dl>
+    </div>
+  );
+}
+
+export function LongDistanceRatingTab({ vehicle }: TabProps) {
+  const metrics = calculateLongDistanceMetrics(
+    vehicle.realWorldRange,
+    vehicle.fastChargingTime,
+    vehicle.usableBatteryCapacity
+  );
+
+  if (!metrics) {
+    return (
+      <div className="mt-8">
+        <div className="bg-amber-50 border border-amber-100 rounded-md p-4">
+          <h3 className="text-base font-medium text-amber-800 mb-2">Insufficient Data</h3>
+          <p className="text-sm text-amber-700">
+            We don't have enough data to calculate the long distance rating for this vehicle.
+            At minimum, we need the real-world range data.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const { 
+    leg1DistanceKm, 
+    leg2DistanceKm, 
+    oneStopRangeKm, 
+    starRating, 
+    leg1DurationStr, 
+    leg2DurationStr, 
+    totalDurationStr,
+    canFastCharge
+  } = metrics;
+  
+  return (
+    <div className="mt-8">
+      <h3 className="text-base font-medium text-gray-900 mb-4">Long Distance Suitability</h3>
+      <p className="text-sm text-gray-500 mb-4">
+        This rating assesses how suited this EV is for long-distance travel using a standardized benchmark.
+        It calculates the total distance achievable in a single trip with one charging stop.
+      </p>
+      
+      <div className="bg-gray-50 p-4 rounded-md mb-6">
+        <h4 className="text-sm font-medium text-gray-700 mb-2">How the "1-Stop Range" works:</h4>
+        <p className="text-sm text-gray-500 mb-3">
+          We measure how far you can travel in a single journey when starting with a full battery, 
+          driving until 10% charge remains, stopping once for a fast-charge up to 80%, 
+          and then continuing until the battery reaches 10% again.
+        </p>
+      </div>
+
+      <h4 className="text-sm font-medium text-gray-700 mb-3">Benchmark Test Results</h4>
+      <div className="overflow-x-auto mb-6">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stage</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Distance</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            <tr>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Leg 1 (100% → 10%)</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><strong>{leg1DistanceKm}</strong> km</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><strong>{leg1DurationStr}</strong></td>
+            </tr>
+            <tr className={!canFastCharge ? "bg-gray-100 text-gray-400" : ""}>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Charging Stop (10% → 80%)</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">0 km</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{canFastCharge ? "15min" : "N/A"}</td>
+            </tr>
+            <tr className={!canFastCharge ? "bg-gray-100 text-gray-400" : ""}>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Leg 2 (80% → 10%)</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <strong>{canFastCharge ? leg2DistanceKm : 0}</strong> km
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <strong>{canFastCharge ? leg2DurationStr : "N/A"}</strong>
+              </td>
+            </tr>
+            <tr className="bg-gray-50 font-medium">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Total 1-Stop Journey</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><strong>{oneStopRangeKm}</strong> km</td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><strong>{totalDurationStr}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-6">
+        <h4 className="text-sm font-medium text-gray-700 mb-2">5-Star Rating</h4>
+        <div className="mb-4">
+          <div className="flex items-center mb-1">
+            <div className="text-lg font-medium text-gray-900">Rating: {starRating.toFixed(1)} / 5.0</div>
+            <div className="ml-3 text-2xl text-yellow-500" aria-hidden="true">
+              {generateStarRating(starRating)}
+            </div>
+          </div>
+          <p className="text-sm text-gray-500">Based on the 2025 EV Long Distance Rating Scale</p>
+        </div>
+
+        <div className="text-sm text-gray-500 space-y-1">
+          <p>⭐ 0 stars: &lt; 200 km</p>
+          <p>⭐ 1 star: 200 - 324 km</p>
+          <p>⭐⭐ 2 stars: 325 - 449 km</p>
+          <p>⭐⭐⭐ 3 stars: 450 - 574 km</p>
+          <p>⭐⭐⭐⭐ 4 stars: 575 - 699 km</p>
+          <p>⭐⭐⭐⭐⭐ 5 stars: 700+ km</p>
+        </div>
+      </div>
     </div>
   );
 }
