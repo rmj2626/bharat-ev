@@ -34,7 +34,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
         {/* Vehicle Image - Fill entire height in desktop view without margins */}
         <div className="relative cursor-pointer md:w-1/4 overflow-hidden" style={{ padding: 0 }}>
           <Link href={`/vehicles/${vehicle.id}`} className="block h-full">
-            <div className="md:h-full w-full" style={{ 
+            <div className="md:h-full w-full bg-gray-100" style={{ 
               aspectRatio: '16/9', 
               padding: 0, 
               margin: 0, 
@@ -50,7 +50,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
                   left: 0,
                   width: '100%', 
                   height: '100%', 
-                  objectFit: 'cover'
+                  objectFit: 'contain'
                 }}
               />
             </div>
