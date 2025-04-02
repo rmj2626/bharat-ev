@@ -197,6 +197,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
               <option value="acceleration">Acceleration: Fastest First</option>
               <option value="horsepower">Horsepower: Highest First</option>
               <option value="torque">Torque: Highest First</option>
+              <option value="long_distance_rating">Long Distance: Best First</option>
             </select>
           </div>
           

@@ -656,6 +656,19 @@ export class MemoryStorage implements IStorage {
         case 'torque':
           filteredVehicles.sort((a, b) => (b.torque || 0) - (a.torque || 0));
           break;
+        case 'long_distance_rating':
+          // Sort by usableBatteryCapacity and fastChargingTime when both are available
+          // Higher battery capacity and faster charging = better for long distance
+          filteredVehicles.sort((a, b) => {
+            const aRating = a.usableBatteryCapacity && a.fastChargingTime 
+              ? a.usableBatteryCapacity / (a.fastChargingTime || Number.MAX_VALUE) 
+              : 0;
+            const bRating = b.usableBatteryCapacity && b.fastChargingTime 
+              ? b.usableBatteryCapacity / (b.fastChargingTime || Number.MAX_VALUE) 
+              : 0;
+            return bRating - aRating;
+          });
+          break;
         default:
           // No sorting
           break;

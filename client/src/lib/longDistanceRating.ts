@@ -65,7 +65,7 @@ export function calculateLongDistanceMetrics(
   const starRating = Math.round(rating * 2) / 2.0;
   
   // Calculate durations
-  const avgSpeedKmh = 80; // Average speed for highway travel
+  const avgSpeedKmh = 70; // Average speed for highway travel
   
   // Calculate efficiency if available, but not used in this version
   const efficiencyKwhPerKm = useableCapacityKwh && realRangeKm 
