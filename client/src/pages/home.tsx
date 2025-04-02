@@ -61,7 +61,7 @@ export default function Home() {
   }, [isError, toast]);
 
   return (
-    <main className="mx-auto py-8" style={{ width: '60%', maxWidth: '1280px' }}>
+    <main className="w-full px-4 md:w-3/5 mx-auto py-8" style={{ maxWidth: '1280px' }}>
       {/* Page Title */}
       <div className="border-b border-gray-200 pb-5 mb-6">
         <h1 className="text-2xl font-bold leading-tight text-gray-900">All Electric Vehicles in India</h1>
@@ -82,8 +82,8 @@ export default function Home() {
         </div>
 
         {/* Results count - visual connection between filter and results */}
-        <div className="py-3 px-6 bg-gray-100 border-b border-gray-200 flex justify-between items-center">
-          <div className="text-sm font-medium text-gray-700">
+        <div className="py-3 px-6 bg-gray-100 border-b border-gray-200 flex justify-center items-center">
+          <div className="text-sm font-medium text-gray-700 text-center">
             <span>{vehiclesData?.pagination?.total || 0}</span> results found
           </div>
         </div>
