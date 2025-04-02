@@ -429,6 +429,7 @@ export class MemoryStorage implements IStorage {
       modelName: carModel.modelName,
       bodyStyleId: bodyStyle.id,
       bodyStyleName: bodyStyle.name,
+      bootSpace: carModel.bootSpace,
       image: carModel.image,
       manufacturingStartYear: carModel.manufacturingStartYear,
       manufacturingEndYear: carModel.manufacturingEndYear,

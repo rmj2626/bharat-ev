@@ -117,6 +117,56 @@ export function PerformanceTab({ vehicle }: TabProps) {
 }
 
 export function ChargingTab({ vehicle }: TabProps) {
+  const getFormattedChargingTime = () => {
+    if (!vehicle.batteryCapacity) return "N/A";
+    
+    // Calculate minutes for 0-100% with 7.4kW AC charger
+    const minutes = Math.round(vehicle.batteryCapacity / 7.4 * 60);
+    
+    if (minutes < 60) {
+      return `${minutes} minutes`;
+    } else {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      return remainingMinutes > 0 
+        ? `${hours} h ${remainingMinutes} min` 
+        : `${hours} hours`;
+    }
+  };
+
+  // Calculate Average DC Fast Charging Speed (10-80%)
+  const getAvgDCFastChargingSpeed = () => {
+    if (!vehicle.usableBatteryCapacity || !vehicle.fastChargingTime) return "N/A";
+    
+    // (Useable Capacity (kWh) * 0.70) / (10-80 time (minutes) / 60)
+    const avgSpeed = (vehicle.usableBatteryCapacity * 0.70) / (vehicle.fastChargingTime / 60);
+    return `${avgSpeed.toFixed(1)} kW`;
+  };
+  
+  // Calculate 10-80% range added
+  const get1080RangeAdded = () => {
+    if (!vehicle.realWorldRange) return "";
+    
+    // Real Range (km) * 0.70
+    const rangeAdded = vehicle.realWorldRange * 0.70;
+    return `(${Math.round(rangeAdded)} km added)`;
+  };
+  
+  // Calculate Range Added per Minute of DC Fast Charging
+  const getRangePerMinute = () => {
+    if (!vehicle.usableBatteryCapacity || !vehicle.fastChargingTime || !vehicle.efficiency || !vehicle.realWorldRange) 
+      return "N/A";
+    
+    // Calculate average charging speed in kW
+    const avgChargingSpeed = (vehicle.usableBatteryCapacity * 0.70) / (vehicle.fastChargingTime / 60);
+    
+    // Range Added per Minute = Average DC Fast Charging Speed (kW) * 1000 / Efficiency (Wh/km) * (1/60)
+    // Simplified: avgChargingSpeed * 1000 / (efficiency * 60)
+    const rangePerMinute = (avgChargingSpeed * 1000) / (vehicle.efficiency * 60);
+    
+    return `${rangePerMinute.toFixed(1)} km/min`;
+  };
+
   return (
     <div className="mt-8">
       <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
@@ -129,35 +179,25 @@ export function ChargingTab({ vehicle }: TabProps) {
         <div className="sm:col-span-1">
           <dt className="text-sm font-medium text-gray-500">Fast Charging Time (10-80%)</dt>
           <dd className="mt-1 text-sm text-gray-900">
-            {vehicle.fastChargingTime ? `${vehicle.fastChargingTime} minutes` : "N/A"}
+            {vehicle.fastChargingTime ? `${vehicle.fastChargingTime} minutes ${get1080RangeAdded()}` : "N/A"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Charging Port Location</dt>
-          <dd className="mt-1 text-sm text-gray-900">{vehicle.chargingPortLocation || "N/A"}</dd>
+          <dt className="text-sm font-medium text-gray-500">Average DC Fast Charging Speed (10-80%)</dt>
+          <dd className="mt-1 text-sm text-gray-900">
+            {getAvgDCFastChargingSpeed()}
+          </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Fast Charging Rate</dt>
+          <dt className="text-sm font-medium text-gray-500">Range Added per Minute (DC Fast Charging)</dt>
           <dd className="mt-1 text-sm text-gray-900">
-            {vehicle.fastChargingCapacity && vehicle.batteryCapacity
-              ? `${Math.round((vehicle.fastChargingCapacity / vehicle.batteryCapacity) * 100)}% of battery / hour`
-              : "N/A"}
+            {getRangePerMinute()}
           </dd>
         </div>
         <div className="sm:col-span-1">
           <dt className="text-sm font-medium text-gray-500">Estimated Charging Time (0-100%, AC 7.4kW)</dt>
           <dd className="mt-1 text-sm text-gray-900">
-            {vehicle.batteryCapacity
-              ? `${Math.round(vehicle.batteryCapacity / 7.4 * 60)} minutes`
-              : "N/A"}
-          </dd>
-        </div>
-        <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Range Added Per Hour (Fast Charging)</dt>
-          <dd className="mt-1 text-sm text-gray-900">
-            {vehicle.fastChargingCapacity && vehicle.realWorldRange && vehicle.batteryCapacity
-              ? `${Math.round((vehicle.fastChargingCapacity / vehicle.batteryCapacity) * vehicle.realWorldRange)} km/hour`
-              : "N/A"}
+            {getFormattedChargingTime()}
           </dd>
         </div>
       </dl>
@@ -298,7 +338,9 @@ export function FeaturesTab({ vehicle }: TabProps) {
         </div>
         <div className="sm:col-span-1">
           <dt className="text-sm font-medium text-gray-500">Boot Space</dt>
-          <dd className="mt-1 text-sm text-gray-900">N/A</dd>
+          <dd className="mt-1 text-sm text-gray-900">
+            {vehicle.bootSpace ? `${vehicle.bootSpace} liters` : "N/A"}
+          </dd>
         </div>
         <div className="sm:col-span-1">
           <dt className="text-sm font-medium text-gray-500">Battery Type</dt>

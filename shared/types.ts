@@ -120,6 +120,7 @@ export interface VehicleWithDetails {
   rangeRatingSystem: string | null;
   batteryWarrantyYears: number | null;
   batteryWarrantyKm: number | null;
+  bootSpace: number | null; // Added bootSpace field
 }
 
 export interface PaginatedResult<T> {
