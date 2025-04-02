@@ -31,14 +31,27 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg hover:shadow-md transition-shadow duration-300">
       <div className="flex flex-col md:flex-row md:h-full">
-        {/* Vehicle Image - Maintain aspect ratio while matching card height */}
-        <div className="relative cursor-pointer md:w-1/4 overflow-hidden">
-          <Link href={`/vehicles/${vehicle.id}`} className="block h-full w-full">
-            <div className="aspect-video md:aspect-auto md:h-full w-full flex items-center justify-center bg-gray-50">
+        {/* Vehicle Image - Fill entire height in desktop view without margins */}
+        <div className="relative cursor-pointer md:w-1/4 overflow-hidden" style={{ padding: 0 }}>
+          <Link href={`/vehicles/${vehicle.id}`} className="block h-full">
+            <div className="md:h-full w-full" style={{ 
+              aspectRatio: '16/9', 
+              padding: 0, 
+              margin: 0, 
+              display: 'block',
+              position: 'relative' 
+            }}>
               <img
                 src={vehicle.image || "https://www.svgrepo.com/show/508699/landscape-placeholder.svg"}
                 alt={`${vehicle.manufacturerName} ${vehicle.modelName} ${vehicle.variantName}`}
-                className="max-h-full max-w-full object-contain"
+                style={{ 
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: '100%', 
+                  height: '100%', 
+                  objectFit: 'cover'
+                }}
               />
             </div>
           </Link>
