@@ -30,15 +30,15 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
 
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg hover:shadow-md transition-shadow duration-300">
-      <div className="flex flex-col md:flex-row">
-        {/* Vehicle Image - Aspect ratio for mobile, 1/4 width for desktop */}
-        <div className="relative cursor-pointer md:w-1/4 md:h-auto">
-          <Link href={`/vehicles/${vehicle.id}`} className="block">
-            <div className="pb-[60%] md:pb-0 md:h-full relative">
+      <div className="flex flex-col md:flex-row md:h-full">
+        {/* Vehicle Image - Make sure the image fills the entire left side of the card */}
+        <div className="relative cursor-pointer md:w-1/4">
+          <Link href={`/vehicles/${vehicle.id}`} className="block h-full">
+            <div className="h-full">
               <img
                 src={vehicle.image || "https://www.svgrepo.com/show/508699/landscape-placeholder.svg"}
                 alt={`${vehicle.manufacturerName} ${vehicle.modelName} ${vehicle.variantName}`}
-                className="absolute inset-0 w-full h-full object-cover md:static"
+                className="w-full h-full object-cover"
               />
             </div>
           </Link>

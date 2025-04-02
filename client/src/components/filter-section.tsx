@@ -200,10 +200,8 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
             </select>
           </div>
           
-          {/* Show results count in mobile view */}
-          <div className="text-sm text-gray-500 text-center my-3">
-            <span>{totalResults}</span> results found
-          </div>
+          {/* Mobile view spacing */}
+          <div className="my-3"></div>
           
           {/* Manufacturer Filter Popup (Mobile) */}
           {isManufacturerMenuOpen && (
