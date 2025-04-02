@@ -134,8 +134,9 @@ export function ChargingTab({ vehicle }: TabProps) {
     }
   };
 
-  // First check if the vehicle has fast charging capability
-  const hasFastCharging = vehicle.fastChargingCapacity !== null;
+  // Check if the vehicle has fast charging capability
+  // Some vehicles (like MG Comet) have fastChargingCapacity = 0 instead of null
+  const hasFastCharging = vehicle.fastChargingCapacity !== null && vehicle.fastChargingCapacity > 0;
   
   // Calculate Average DC Fast Charging Speed (10-80%)
   const getAvgDCFastChargingSpeed = () => {
@@ -176,13 +177,17 @@ export function ChargingTab({ vehicle }: TabProps) {
         <div className="sm:col-span-1">
           <dt className="text-sm font-medium text-gray-500">Fast Charging Capacity</dt>
           <dd className="mt-1 text-sm text-gray-900">
-            {vehicle.fastChargingCapacity ? `${vehicle.fastChargingCapacity} kW` : "N/A"}
+            {vehicle.fastChargingCapacity && vehicle.fastChargingCapacity > 0 
+              ? `${vehicle.fastChargingCapacity} kW` 
+              : "Not Supported"}
           </dd>
         </div>
         <div className="sm:col-span-1">
           <dt className="text-sm font-medium text-gray-500">Fast Charging Time (10-80%)</dt>
           <dd className="mt-1 text-sm text-gray-900">
-            {vehicle.fastChargingTime ? `${vehicle.fastChargingTime} minutes ${get1080RangeAdded()}` : "N/A"}
+            {hasFastCharging && vehicle.fastChargingTime 
+              ? `${vehicle.fastChargingTime} minutes ${get1080RangeAdded()}` 
+              : "Not Supported"}
           </dd>
         </div>
         <div className="sm:col-span-1">
@@ -209,8 +214,9 @@ export function ChargingTab({ vehicle }: TabProps) {
 }
 
 export function LongDistanceRatingTab({ vehicle }: TabProps) {
-  // First check if the vehicle has fast charging capability
-  const hasFastCharging = vehicle.fastChargingCapacity !== null;
+  // Check if the vehicle has fast charging capability
+  // Some vehicles (like MG Comet) have fastChargingCapacity = 0 instead of null
+  const hasFastCharging = vehicle.fastChargingCapacity !== null && vehicle.fastChargingCapacity > 0;
   
   // If vehicle doesn't support fast charging, display appropriate message
   if (!hasFastCharging) {

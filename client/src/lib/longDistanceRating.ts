@@ -30,8 +30,8 @@ export function calculateLongDistanceMetrics(
     return null;
   }
 
-  // Check if fast charging is available
-  const canFastCharge = Boolean(time10To80Min && time10To80Min > 0);
+  // Check if fast charging is available - both values must be positive
+  const canFastCharge = Boolean(time10To80Min && time10To80Min > 0 && useableCapacityKwh && useableCapacityKwh > 0);
   
   // Calculate Leg 1 Distance
   const leg1DistanceKm = parseFloat((realRangeKm * 0.9).toFixed(1));
