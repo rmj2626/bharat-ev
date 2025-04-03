@@ -1,96 +1,74 @@
-# EV Database India - Setup and Deployment Guide
+# EV Database - Simplified Setup Guide
 
 ## Project Overview
 
-EV Database India is a comprehensive web application for tracking and comparing electric vehicles available in the Indian market. The application provides detailed information about EV specifications, features, and prices, and offers comparison capabilities for users to evaluate different models.
+This is a comprehensive web application for tracking and comparing electric vehicles. The application provides detailed information about EV specifications, features, and prices, and offers comparison capabilities for users to evaluate different models.
 
 ### Key Features
 - Searchable and filterable database of 45 EV models and 135 vehicle variants
 - Detailed vehicle specifications and performance metrics
 - Vehicle comparison tool (up to 3 vehicles)
-  - Intuitive comparison bar with fully clickable vehicle cards 
-  - Contextual UI with comparison bar hidden on the compare page
-  - Optimized layouts for both mobile and desktop views
 - Admin panel for content management with secure authentication
 - Responsive design for mobile and desktop
-  - Enhanced filter section with visual indicators in desktop mode
-  - Mobile-optimized manufacturer filter popup
-- Dual storage support
-  - Primary PostgreSQL database for full functionality
-  - In-memory fallback storage for restricted environments (like Replit)
 
 ## Tech Stack
 
 - **Frontend**: React (TypeScript), ShadCN UI Components, Tailwind CSS
 - **Backend**: Node.js/Express
-- **Database**: 
-  - **Primary**: PostgreSQL with Drizzle ORM
-  - **Fallback**: In-memory storage with CSV data import
+- **Database**: PostgreSQL with Drizzle ORM
 - **Authentication**: Session-based authentication with Passport
 - **Image Storage**: Cloudinary
 
-## Setup Instructions
+## Quick Setup Instructions
 
-### Prerequisites
-- Node.js (v18+)
-- PostgreSQL (v13+)
-- Git
+### 1. Configure PostgreSQL Database
+The application requires a PostgreSQL database connection. Make sure your database is properly configured and the connection information is available in environment variables.
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/yourusername/ev-database-india.git
-cd ev-database-india
-```
+### 2. Push Database Schema
+Run the Drizzle ORM schema push command to set up the database tables:
 
-### 2. Install Dependencies
-```bash
-npm install
-```
-
-### 3. Configure Environment Variables
-Create a `.env` file in the root directory with the following variables:
-
-```env
-# Database Connection
-DATABASE_URL=postgres://username:password@localhost:5432/evdatabase
-PGUSER=username
-PGPASSWORD=password
-PGDATABASE=evdatabase
-PGHOST=localhost
-PGPORT=5432
-
-# Session Secret
-SESSION_SECRET=your_random_string_here
-
-# Cloudinary (for image uploads)
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-```
-
-### 4. Create the Database
-```bash
-createdb evdatabase
-```
-
-Or use a PostgreSQL client to create the database.
-
-### 5. Push Schema to Database
 ```bash
 npm run db:push
 ```
 
-This command utilizes Drizzle to push the schema defined in `shared/schema.ts` to your database.
+### 3. Import EV Data
+To import all the EV data (manufacturers, models, and vehicles), simply run the import workflow:
 
-### 6. Seed Initial Data (Optional)
-The application includes automatic seeding of default data in `server/routes.ts`. If you want to customize this initial data, modify the `seedDefaultData()` function.
-
-### 7. Start Development Server
-```bash
-npm run dev
+```
+Import EV Data
 ```
 
-The application should now be running on [http://localhost:5000](http://localhost:5000).
+This single command will:
+- Clear existing tables to start fresh
+- Import reference data (body styles, drive types, etc.)
+- Import all 15 manufacturers from CSV
+- Import all 45 car models from CSV
+- Import all 135 vehicles from CSV
+- Create default admin user (username: 'admin', password: 'admin')
+
+### 4. Start the Server
+Start the development server:
+
+```
+EV Database Server
+```
+
+The application will be running on port 5000.
+
+## Database Structure
+
+The database contains the following main tables:
+- manufacturers
+- car_models
+- vehicles
+- body_styles
+- drive_types
+- battery_types
+- charging_port_locations
+- range_rating_systems
+- users
+
+All schema definitions are in `shared/schema.ts` using Drizzle ORM.
 
 ## Deployment
 
@@ -155,7 +133,7 @@ node -e "require('./migrate.js').migrate()"
 ## Project Structure
 
 ```
-├── attached_assets/     # CSV data files for in-memory storage
+├── attached_assets/     # CSV data files for import
 │   ├── manufacturers_final.csv  # Manufacturer data
 │   ├── models_final.csv         # Car model data
 │   └── vehicles_final.csv       # Vehicle variant data
@@ -189,11 +167,11 @@ node -e "require('./migrate.js').migrate()"
 │   ├── schema.ts        # Database schema definition
 │   └── types.ts         # Shared TypeScript types
 ├── DEVELOPMENT_NOTES.md # Developer documentation for dual storage
+├── IMPORT_INSTRUCTIONS.md # Detailed data import instructions
 ├── README.md            # Project documentation
 ├── drizzle.config.ts    # Drizzle ORM configuration
-├── import-csv-data.ts   # Script to import CSV data
-├── migrate.ts           # Database migration script
 ├── package.json         # Project configuration
+├── simple-import.js     # Simplified CSV import script
 └── tailwind.config.ts   # Tailwind CSS configuration
 ```
 
