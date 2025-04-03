@@ -17,9 +17,20 @@ export default function DrivingMixSelector({
   const [dragging, setDragging] = useState<number | null>(null);
   const [dividers, setDividers] = useState([cityPercent, cityPercent + statePercent]);
 
-  // Update internal state when props change
+  // Initialize dividers only when props change significantly
+  const prevCityPercent = useRef(cityPercent);
+  const prevStatePercent = useRef(statePercent);
+  
   useEffect(() => {
-    setDividers([cityPercent, cityPercent + statePercent]);
+    // Check if props changed significantly to avoid render loop
+    if (
+      Math.abs(prevCityPercent.current - cityPercent) > 0.5 || 
+      Math.abs(prevStatePercent.current - statePercent) > 0.5
+    ) {
+      setDividers([cityPercent, cityPercent + statePercent]);
+      prevCityPercent.current = cityPercent;
+      prevStatePercent.current = statePercent;
+    }
   }, [cityPercent, statePercent]);
 
   // Handle mouse/touch down on a divider
