@@ -560,54 +560,76 @@ export class DatabaseStorage implements IStorage {
     // Text search
     if (filter.searchTerm) {
       // Trim the search term and handle whitespace properly
-      const trimmedSearchTerm = filter.searchTerm.trim();
+      const trimmedSearchTerm = filter.searchTerm.trim().toLowerCase();
       
       if (trimmedSearchTerm) {
-        // Split search terms by whitespace to handle combined searches like "MG Comet"
-        const searchTerms = trimmedSearchTerm.split(/\s+/);
+        // We'll modify our approach to use a custom scoring system
+        // Instead of filtering with a WHERE clause, we'll add a scoring column
+        // and then sort by that score
         
-        if (searchTerms.length === 1) {
-          // Single term search
-          const searchPattern = `%${trimmedSearchTerm}%`;
-          conditions = sql`${conditions} AND (
-            LOWER(m.name) LIKE LOWER(${searchPattern})
-            OR LOWER(cm.model_name) LIKE LOWER(${searchPattern})
-            OR LOWER(v.variant_name) LIKE LOWER(${searchPattern})
-          )`;
-        } else {
-          // Multi-term search - create conditions for each term
-          const searchConditions = [];
+        // This adds a "search_score" column to our results
+        const scoringQuery = sql`
+          CASE
+            -- Exact matches get the highest score (1000)
+            WHEN LOWER(m.name) = ${trimmedSearchTerm} THEN 1000
+            WHEN LOWER(cm.model_name) = ${trimmedSearchTerm} THEN 1000
+            WHEN LOWER(v.variant_name) = ${trimmedSearchTerm} THEN 1000
+            
+            -- Exact matches of manufacturer + model name get very high score (900)
+            WHEN LOWER(m.name || ' ' || cm.model_name) = ${trimmedSearchTerm} THEN 900
+            
+            -- Matches at the beginning of strings get high scores (800)
+            WHEN LOWER(m.name) LIKE ${trimmedSearchTerm + '%'} THEN 800
+            WHEN LOWER(cm.model_name) LIKE ${trimmedSearchTerm + '%'} THEN 800
+            WHEN LOWER(v.variant_name) LIKE ${trimmedSearchTerm + '%'} THEN 800
+            WHEN LOWER(m.name || ' ' || cm.model_name) LIKE ${trimmedSearchTerm + '%'} THEN 800
+            
+            -- Contains matches get medium scores (500)
+            WHEN LOWER(m.name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
+            WHEN LOWER(cm.model_name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
+            WHEN LOWER(v.variant_name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
+            WHEN LOWER(m.name || ' ' || cm.model_name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
+            
+            -- Default to 0 score for non-matches
+            ELSE 0
+          END AS search_score
+        `;
+        
+        // Add the scoring column to our query
+        query = sql`${query}, ${scoringQuery}`;
+        
+        // Now add a condition to only include results with a score > 0
+        conditions = sql`${conditions} AND (
+          LOWER(m.name) LIKE ${'%' + trimmedSearchTerm + '%'}
+          OR LOWER(cm.model_name) LIKE ${'%' + trimmedSearchTerm + '%'}
+          OR LOWER(v.variant_name) LIKE ${'%' + trimmedSearchTerm + '%'}
+          OR LOWER(m.name || ' ' || cm.model_name) LIKE ${'%' + trimmedSearchTerm + '%'}
+        )`;
+        
+        // For multi-word searches, we need additional handling
+        const searchTerms = trimmedSearchTerm.split(/\s+/);
+        if (searchTerms.length > 1) {
+          // These are word-by-word matches
+          // We'll add an additional scoring factor later in the ORDER BY clause
           
-          // First, try exact match with the entire search term
-          const exactPattern = `%${trimmedSearchTerm}%`;
-          searchConditions.push(sql`(
-            LOWER(m.name) LIKE LOWER(${exactPattern})
-            OR LOWER(cm.model_name) LIKE LOWER(${exactPattern})
-            OR LOWER(v.variant_name) LIKE LOWER(${exactPattern})
-          )`);
+          // For multi-word cases, add specific handling for manufacturer + model
+          // First word = manufacturer, Second+ words = model
+          const potentialManufacturer = searchTerms[0];
+          const potentialModel = searchTerms.slice(1).join(' ');
           
-          // Then try combinations of manufacturer + model
-          const manufacturerModelCondition = sql`(
-            EXISTS (
-              SELECT 1 
-              WHERE LOWER(m.name || ' ' || cm.model_name) LIKE LOWER(${`%${trimmedSearchTerm}%`})
-            )
-          )`;
-          searchConditions.push(manufacturerModelCondition);
+          // Add a powerful condition for exact matches of [manufacturer + model]
+          const exactMatchCondition = sql`
+            (LOWER(m.name) = ${potentialManufacturer} AND LOWER(cm.model_name) = ${potentialModel})
+          `;
           
-          // Add individual terms
-          for (const term of searchTerms) {
-            if (term.length > 1) { // Skip very short terms
-              const termPattern = `%${term}%`;
-              searchConditions.push(sql`(
-                LOWER(m.name) LIKE LOWER(${termPattern})
-                OR LOWER(cm.model_name) LIKE LOWER(${termPattern})
-                OR LOWER(v.variant_name) LIKE LOWER(${termPattern})
-              )`);
-            }
-          }
+          // Add a condition for partial matches too
+          const partialMatchCondition = sql`
+            (LOWER(m.name) LIKE ${'%' + potentialManufacturer + '%'} 
+             AND LOWER(cm.model_name) LIKE ${'%' + potentialModel + '%'})
+          `;
           
-          conditions = sql`${conditions} AND (${sql.join(searchConditions, sql` OR `)})`;
+          // Combine the conditions with an OR
+          conditions = sql`${conditions} OR ${exactMatchCondition} OR ${partialMatchCondition}`;
         }
       }
     }
@@ -617,45 +639,92 @@ export class DatabaseStorage implements IStorage {
     
     // Add ORDER BY based on sort parameter
     let orderBy;
-    switch (filter.sortBy) {
-      case 'popular':
-        orderBy = sql` ORDER BY cm.view_count DESC`;
-        break;
-      case 'price_low':
-        orderBy = sql` ORDER BY v.price ASC`;
-        break;
-      case 'price_high':
-        orderBy = sql` ORDER BY v.price DESC`;
-        break;
-      case 'range_high':
-        orderBy = sql` ORDER BY v.real_world_range DESC`;
-        break;
-      case 'battery_high':
-        orderBy = sql` ORDER BY v.battery_capacity DESC`;
-        break;
-      case 'efficiency':
-        orderBy = sql` ORDER BY v.efficiency ASC`;
-        break;
-      case 'acceleration':
-        orderBy = sql` ORDER BY v.acceleration ASC`;
-        break;
-      case 'weight_low':
-        orderBy = sql` ORDER BY v.weight ASC`;
-        break;
-      case 'weight_high':
-        orderBy = sql` ORDER BY v.weight DESC`;
-        break;
-      case 'charging_fast':
-        orderBy = sql` ORDER BY v.fast_charging_capacity DESC`;
-        break;
-      case 'horsepower':
-        orderBy = sql` ORDER BY v.horsepower DESC`;
-        break;
-      case 'torque':
-        orderBy = sql` ORDER BY v.torque DESC`;
-        break;
-      default:
-        orderBy = sql` ORDER BY cm.view_count DESC`;
+    
+    // If we have a search term, prioritize ordering by search score first
+    if (filter.searchTerm && filter.searchTerm.trim()) {
+      // For search queries, we want to order by search_score first, then the selected sort
+      switch (filter.sortBy) {
+        case 'popular':
+          orderBy = sql` ORDER BY search_score DESC, cm.view_count DESC`;
+          break;
+        case 'price_low':
+          orderBy = sql` ORDER BY search_score DESC, v.price ASC`;
+          break;
+        case 'price_high':
+          orderBy = sql` ORDER BY search_score DESC, v.price DESC`;
+          break;
+        case 'range_high':
+          orderBy = sql` ORDER BY search_score DESC, v.real_world_range DESC`;
+          break;
+        case 'battery_high':
+          orderBy = sql` ORDER BY search_score DESC, v.battery_capacity DESC`;
+          break;
+        case 'efficiency':
+          orderBy = sql` ORDER BY search_score DESC, v.efficiency ASC`;
+          break;
+        case 'acceleration':
+          orderBy = sql` ORDER BY search_score DESC, v.acceleration ASC`;
+          break;
+        case 'weight_low':
+          orderBy = sql` ORDER BY search_score DESC, v.weight ASC`;
+          break;
+        case 'weight_high':
+          orderBy = sql` ORDER BY search_score DESC, v.weight DESC`;
+          break;
+        case 'charging_fast':
+          orderBy = sql` ORDER BY search_score DESC, v.fast_charging_capacity DESC`;
+          break;
+        case 'horsepower':
+          orderBy = sql` ORDER BY search_score DESC, v.horsepower DESC`;
+          break;
+        case 'torque':
+          orderBy = sql` ORDER BY search_score DESC, v.torque DESC`;
+          break;
+        default:
+          orderBy = sql` ORDER BY search_score DESC, cm.view_count DESC`;
+      }
+    } else {
+      // No search term, so use the regular sort order
+      switch (filter.sortBy) {
+        case 'popular':
+          orderBy = sql` ORDER BY cm.view_count DESC`;
+          break;
+        case 'price_low':
+          orderBy = sql` ORDER BY v.price ASC`;
+          break;
+        case 'price_high':
+          orderBy = sql` ORDER BY v.price DESC`;
+          break;
+        case 'range_high':
+          orderBy = sql` ORDER BY v.real_world_range DESC`;
+          break;
+        case 'battery_high':
+          orderBy = sql` ORDER BY v.battery_capacity DESC`;
+          break;
+        case 'efficiency':
+          orderBy = sql` ORDER BY v.efficiency ASC`;
+          break;
+        case 'acceleration':
+          orderBy = sql` ORDER BY v.acceleration ASC`;
+          break;
+        case 'weight_low':
+          orderBy = sql` ORDER BY v.weight ASC`;
+          break;
+        case 'weight_high':
+          orderBy = sql` ORDER BY v.weight DESC`;
+          break;
+        case 'charging_fast':
+          orderBy = sql` ORDER BY v.fast_charging_capacity DESC`;
+          break;
+        case 'horsepower':
+          orderBy = sql` ORDER BY v.horsepower DESC`;
+          break;
+        case 'torque':
+          orderBy = sql` ORDER BY v.torque DESC`;
+          break;
+        default:
+          orderBy = sql` ORDER BY cm.view_count DESC`;
+      }
     }
     
     query = sql`${query} ${orderBy}`;

@@ -607,100 +607,156 @@ export class MemoryStorage implements IStorage {
         v.batteryWarrantyKm !== null && v.batteryWarrantyKm <= filter.maxBatteryWarrantyKm!);
     }
 
-    // Search term filtering
+    // Search term filtering with scoring
     if (filter.searchTerm) {
       // Trim the search term and handle whitespace properly
-      const trimmedSearchTerm = filter.searchTerm.trim();
+      const trimmedSearchTerm = filter.searchTerm.trim().toLowerCase();
       
       if (trimmedSearchTerm) {
-        // Split search terms by whitespace to handle combined searches like "MG Comet"
-        const searchTerms = trimmedSearchTerm.split(/\s+/);
-        
-        if (searchTerms.length === 1) {
-          // Single term search
-          const searchTermLower = trimmedSearchTerm.toLowerCase();
-          filteredVehicles = filteredVehicles.filter(v => 
-            v.modelName.toLowerCase().includes(searchTermLower) ||
-            v.variantName.toLowerCase().includes(searchTermLower) ||
-            v.manufacturerName.toLowerCase().includes(searchTermLower)
-          );
-        } else {
-          // Multi-term search
-          // Try exact match with full search term
-          const exactTermLower = trimmedSearchTerm.toLowerCase();
-          const exactMatches = filteredVehicles.filter(v => 
-            v.modelName.toLowerCase().includes(exactTermLower) ||
-            v.variantName.toLowerCase().includes(exactTermLower) ||
-            v.manufacturerName.toLowerCase().includes(exactTermLower) ||
-            // Combined manufacturer + model match
-            (`${v.manufacturerName} ${v.modelName}`).toLowerCase().includes(exactTermLower)
-          );
+        // Add a search score to each vehicle
+        for (const vehicle of filteredVehicles) {
+          let score = 0;
+          const modelNameLower = vehicle.modelName.toLowerCase();
+          const variantNameLower = vehicle.variantName.toLowerCase();
+          const manufacturerNameLower = vehicle.manufacturerName.toLowerCase();
+          const combinedManufacturerModelLower = `${manufacturerNameLower} ${modelNameLower}`;
           
-          if (exactMatches.length > 0) {
-            // If we have exact matches, use those
-            filteredVehicles = exactMatches;
-          } else {
-            // Otherwise, try matching individual terms - must match ALL terms
-            filteredVehicles = filteredVehicles.filter(v => {
-              // Each search term must match at least one of the attributes
-              return searchTerms.every(term => {
-                if (term.length <= 1) return true; // Skip very short terms
-                
-                const termLower = term.toLowerCase();
-                return (
-                  v.modelName.toLowerCase().includes(termLower) ||
-                  v.variantName.toLowerCase().includes(termLower) ||
-                  v.manufacturerName.toLowerCase().includes(termLower)
-                );
-              });
-            });
+          // Exact matches get highest score (1000)
+          if (modelNameLower === trimmedSearchTerm) score = Math.max(score, 1000);
+          if (variantNameLower === trimmedSearchTerm) score = Math.max(score, 1000);
+          if (manufacturerNameLower === trimmedSearchTerm) score = Math.max(score, 1000);
+          
+          // Exact matches of manufacturer + model name get very high score (900)
+          if (combinedManufacturerModelLower === trimmedSearchTerm) score = Math.max(score, 900);
+          
+          // Matches at the beginning of strings get high scores (800)
+          if (modelNameLower.startsWith(trimmedSearchTerm)) score = Math.max(score, 800);
+          if (variantNameLower.startsWith(trimmedSearchTerm)) score = Math.max(score, 800);
+          if (manufacturerNameLower.startsWith(trimmedSearchTerm)) score = Math.max(score, 800);
+          if (combinedManufacturerModelLower.startsWith(trimmedSearchTerm)) score = Math.max(score, 800);
+          
+          // Contains matches get medium scores (500)
+          if (modelNameLower.includes(trimmedSearchTerm)) score = Math.max(score, 500);
+          if (variantNameLower.includes(trimmedSearchTerm)) score = Math.max(score, 500);
+          if (manufacturerNameLower.includes(trimmedSearchTerm)) score = Math.max(score, 500);
+          if (combinedManufacturerModelLower.includes(trimmedSearchTerm)) score = Math.max(score, 500);
+          
+          // For multi-word searches, add additional scoring logic
+          const searchTerms = trimmedSearchTerm.split(/\s+/);
+          if (searchTerms.length > 1) {
+            // First word is potential manufacturer, rest is potential model
+            const potentialManufacturer = searchTerms[0];
+            const potentialModel = searchTerms.slice(1).join(' ');
+            
+            // Exact match of [manufacturer + model] gets very high score
+            if (manufacturerNameLower === potentialManufacturer && 
+                modelNameLower === potentialModel) {
+              score = Math.max(score, 950);
+            }
+            
+            // Partial matches of manufacturer and model get high score too
+            if (manufacturerNameLower.includes(potentialManufacturer) && 
+                modelNameLower.includes(potentialModel)) {
+              score = Math.max(score, 850);
+            }
+            
+            // If all terms match somewhere, give some score
+            if (searchTerms.every(term => {
+              if (term.length <= 1) return true; // Skip very short terms
+              return (
+                modelNameLower.includes(term) ||
+                variantNameLower.includes(term) ||
+                manufacturerNameLower.includes(term)
+              );
+            })) {
+              score = Math.max(score, 400);
+            }
           }
+          
+          // Add score to the vehicle (using a property that won't conflict)
+          (vehicle as any)._searchScore = score;
         }
+        
+        // Filter out vehicles with zero score
+        filteredVehicles = filteredVehicles.filter(v => (v as any)._searchScore > 0);
+        
+        // Sort by search score (will be used first, before any other sort criteria)
+        filteredVehicles.sort((a, b) => (b as any)._searchScore - (a as any)._searchScore);
       }
     }
 
     // Apply sorting
-    if (filter.sortBy) {
-      switch (filter.sortBy) {
+    // If we have a search term, the vehicles are already sorted by search score
+    // We need to do a stable sort to maintain the search score order
+    if (filter.sortBy && (!filter.searchTerm || !filter.searchTerm.trim())) {
+      // No search term, just apply the sort directly
+      applySorting(filteredVehicles, filter.sortBy);
+    } else if (filter.sortBy && filter.searchTerm && filter.searchTerm.trim()) {
+      // We have a search term, so we need to do a stable sort that preserves the
+      // search score order for items with the same sort value
+      
+      // Group vehicles by their search score
+      const scoreGroups = new Map<number, VehicleWithDetails[]>();
+      for (const vehicle of filteredVehicles) {
+        const score = (vehicle as any)._searchScore || 0;
+        if (!scoreGroups.has(score)) {
+          scoreGroups.set(score, []);
+        }
+        scoreGroups.get(score)!.push(vehicle);
+      }
+      
+      // Sort each group by the sorting criteria
+      for (const [_, group] of scoreGroups) {
+        applySorting(group, filter.sortBy);
+      }
+      
+      // Rebuild the filtered vehicles list in descending order of score
+      filteredVehicles = [];
+      const scores = Array.from(scoreGroups.keys()).sort((a, b) => b - a);
+      for (const score of scores) {
+        filteredVehicles.push(...scoreGroups.get(score)!);
+      }
+    }
+    
+    // Helper function to apply sorting to a list of vehicles
+    function applySorting(vehicles: VehicleWithDetails[], sortBy: string) {
+      switch (sortBy) {
         case 'popular':
           // Not implemented in memory storage, default to price
-          filteredVehicles.sort((a, b) => (a.price || 0) - (b.price || 0));
+          vehicles.sort((a, b) => (a.price || 0) - (b.price || 0));
           break;
         case 'price_low':
-          filteredVehicles.sort((a, b) => (a.price || 0) - (b.price || 0));
+          vehicles.sort((a, b) => (a.price || 0) - (b.price || 0));
           break;
         case 'price_high':
-          filteredVehicles.sort((a, b) => (b.price || 0) - (a.price || 0));
+          vehicles.sort((a, b) => (b.price || 0) - (a.price || 0));
           break;
         case 'range_high':
-          filteredVehicles.sort((a, b) => (b.realWorldRange || 0) - (a.realWorldRange || 0));
+          vehicles.sort((a, b) => (b.realWorldRange || 0) - (a.realWorldRange || 0));
           break;
         case 'battery_high':
-          filteredVehicles.sort((a, b) => (b.batteryCapacity || 0) - (a.batteryCapacity || 0));
+          vehicles.sort((a, b) => (b.batteryCapacity || 0) - (a.batteryCapacity || 0));
           break;
         case 'efficiency':
-          filteredVehicles.sort((a, b) => (a.efficiency || 999) - (b.efficiency || 999)); // Lower is better
+          vehicles.sort((a, b) => (a.efficiency || 999) - (b.efficiency || 999)); // Lower is better
           break;
         case 'acceleration':
-          filteredVehicles.sort((a, b) => (a.acceleration || 999) - (b.acceleration || 999)); // Lower is better
+          vehicles.sort((a, b) => (a.acceleration || 999) - (b.acceleration || 999)); // Lower is better
           break;
         case 'weight_low':
-          filteredVehicles.sort((a, b) => (a.weight || 0) - (b.weight || 0));
+          vehicles.sort((a, b) => (a.weight || 0) - (b.weight || 0));
           break;
         case 'weight_high':
-          filteredVehicles.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+          vehicles.sort((a, b) => (b.weight || 0) - (a.weight || 0));
           break;
         case 'charging_fast':
-          filteredVehicles.sort((a, b) => (b.fastChargingCapacity || 0) - (a.fastChargingCapacity || 0));
+          vehicles.sort((a, b) => (b.fastChargingCapacity || 0) - (a.fastChargingCapacity || 0));
           break;
         case 'horsepower':
-          filteredVehicles.sort((a, b) => (b.horsepower || 0) - (a.horsepower || 0));
+          vehicles.sort((a, b) => (b.horsepower || 0) - (a.horsepower || 0));
           break;
         case 'torque':
-          filteredVehicles.sort((a, b) => (b.torque || 0) - (a.torque || 0));
-          break;
-        default:
-          // No sorting
+          vehicles.sort((a, b) => (b.torque || 0) - (a.torque || 0));
           break;
       }
     }
