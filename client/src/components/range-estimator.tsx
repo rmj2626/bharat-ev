@@ -3,6 +3,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { VehicleWithDetails } from "@shared/types";
+import DrivingMixSelector from "./driving-mix-selector";
 
 interface RangeEstimatorProps {
   vehicle: VehicleWithDetails;
@@ -268,63 +269,15 @@ export default function RangeEstimator({ vehicle }: RangeEstimatorProps) {
           </div>
         </div>
 
-        {/* Driving Mix Sliders */}
+        {/* Driving Mix Selector */}
         <div className="space-y-4">
           <h5 className="text-sm font-medium text-gray-700">Driving Mix (total: 100%)</h5>
-          
-          {/* City */}
-          <div className="space-y-1">
-            <div className="flex justify-between">
-              <label className="text-xs text-gray-600">City: {cityPercent}%</label>
-            </div>
-            <Slider
-              value={[cityPercent]}
-              min={0}
-              max={100}
-              step={1}
-              onValueChange={handleCityChange}
-              aria-label="City percentage"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={cityPercent}
-            />
-          </div>
-          
-          {/* State Highway */}
-          <div className="space-y-1">
-            <div className="flex justify-between">
-              <label className="text-xs text-gray-600">State Highway: {statePercent}%</label>
-            </div>
-            <Slider
-              value={[statePercent]}
-              min={0}
-              max={100}
-              step={1}
-              onValueChange={handleStateChange}
-              aria-label="State highway percentage"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={statePercent}
-            />
-          </div>
-          
-          {/* National Highway */}
-          <div className="space-y-1">
-            <div className="flex justify-between">
-              <label className="text-xs text-gray-600">National Highway: {nationalPercent}%</label>
-            </div>
-            <Slider
-              value={[nationalPercent]}
-              min={0}
-              max={100}
-              step={1}
-              onValueChange={handleNationalChange}
-              aria-label="National highway percentage"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={nationalPercent}
-            />
-          </div>
+          <DrivingMixSelector
+            cityPercent={cityPercent}
+            statePercent={statePercent}
+            nationalPercent={nationalPercent}
+            onMixChange={adjustDrivingMix}
+          />
         </div>
 
         <div className="bg-gray-100 p-4 rounded-md">
