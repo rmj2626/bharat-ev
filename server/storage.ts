@@ -563,74 +563,56 @@ export class DatabaseStorage implements IStorage {
       const trimmedSearchTerm = filter.searchTerm.trim().toLowerCase();
       
       if (trimmedSearchTerm) {
-        // We'll modify our approach to use a custom scoring system
-        // Instead of filtering with a WHERE clause, we'll add a scoring column
-        // and then sort by that score
-        
-        // This adds a "search_score" column to our results
-        const scoringQuery = sql`
-          CASE
-            -- Exact matches get the highest score (1000)
-            WHEN LOWER(m.name) = ${trimmedSearchTerm} THEN 1000
-            WHEN LOWER(cm.model_name) = ${trimmedSearchTerm} THEN 1000
-            WHEN LOWER(v.variant_name) = ${trimmedSearchTerm} THEN 1000
-            
-            -- Exact matches of manufacturer + model name get very high score (900)
-            WHEN LOWER(m.name || ' ' || cm.model_name) = ${trimmedSearchTerm} THEN 900
-            
-            -- Matches at the beginning of strings get high scores (800)
-            WHEN LOWER(m.name) LIKE ${trimmedSearchTerm + '%'} THEN 800
-            WHEN LOWER(cm.model_name) LIKE ${trimmedSearchTerm + '%'} THEN 800
-            WHEN LOWER(v.variant_name) LIKE ${trimmedSearchTerm + '%'} THEN 800
-            WHEN LOWER(m.name || ' ' || cm.model_name) LIKE ${trimmedSearchTerm + '%'} THEN 800
-            
-            -- Contains matches get medium scores (500)
-            WHEN LOWER(m.name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
-            WHEN LOWER(cm.model_name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
-            WHEN LOWER(v.variant_name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
-            WHEN LOWER(m.name || ' ' || cm.model_name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
-            
-            -- Default to 0 score for non-matches
-            ELSE 0
-          END AS search_score
-        `;
-        
-        // Add the scoring column to our query
-        query = sql`${query}, ${scoringQuery}`;
-        
-        // Now add a condition to only include results with a score > 0
-        conditions = sql`${conditions} AND (
+        // Simple search condition
+        const searchCondition = sql`(
           LOWER(m.name) LIKE ${'%' + trimmedSearchTerm + '%'}
           OR LOWER(cm.model_name) LIKE ${'%' + trimmedSearchTerm + '%'}
           OR LOWER(v.variant_name) LIKE ${'%' + trimmedSearchTerm + '%'}
           OR LOWER(m.name || ' ' || cm.model_name) LIKE ${'%' + trimmedSearchTerm + '%'}
         )`;
         
-        // For multi-word searches, we need additional handling
+        conditions = sql`${conditions} AND ${searchCondition}`;
+        
+        // For multi-word searches, add special handling for manufacturer + model pattern
         const searchTerms = trimmedSearchTerm.split(/\s+/);
         if (searchTerms.length > 1) {
-          // These are word-by-word matches
-          // We'll add an additional scoring factor later in the ORDER BY clause
-          
-          // For multi-word cases, add specific handling for manufacturer + model
-          // First word = manufacturer, Second+ words = model
           const potentialManufacturer = searchTerms[0];
           const potentialModel = searchTerms.slice(1).join(' ');
           
-          // Add a powerful condition for exact matches of [manufacturer + model]
-          const exactMatchCondition = sql`
+          // Add special conditions for manufacturer + model pattern
+          const mfgModelCondition = sql`(
             (LOWER(m.name) = ${potentialManufacturer} AND LOWER(cm.model_name) = ${potentialModel})
-          `;
+            OR (LOWER(m.name) LIKE ${'%' + potentialManufacturer + '%'} 
+                AND LOWER(cm.model_name) LIKE ${'%' + potentialModel + '%'})
+          )`;
           
-          // Add a condition for partial matches too
-          const partialMatchCondition = sql`
-            (LOWER(m.name) LIKE ${'%' + potentialManufacturer + '%'} 
-             AND LOWER(cm.model_name) LIKE ${'%' + potentialModel + '%'})
-          `;
-          
-          // Combine the conditions with an OR
-          conditions = sql`${conditions} OR ${exactMatchCondition} OR ${partialMatchCondition}`;
+          conditions = sql`${conditions} OR ${mfgModelCondition}`;
         }
+        
+        // Add a scoring column for ordering results by relevance
+        query = sql`${query}, 
+          CASE
+            -- Exact matches
+            WHEN LOWER(m.name) = ${trimmedSearchTerm} THEN 1000
+            WHEN LOWER(cm.model_name) = ${trimmedSearchTerm} THEN 1000
+            WHEN LOWER(v.variant_name) = ${trimmedSearchTerm} THEN 1000
+            WHEN LOWER(m.name || ' ' || cm.model_name) = ${trimmedSearchTerm} THEN 900
+            
+            -- Starts with matches
+            WHEN LOWER(m.name) LIKE ${trimmedSearchTerm + '%'} THEN 800
+            WHEN LOWER(cm.model_name) LIKE ${trimmedSearchTerm + '%'} THEN 800
+            WHEN LOWER(v.variant_name) LIKE ${trimmedSearchTerm + '%'} THEN 800
+            WHEN LOWER(m.name || ' ' || cm.model_name) LIKE ${trimmedSearchTerm + '%'} THEN 800
+            
+            -- Contains matches
+            WHEN LOWER(m.name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
+            WHEN LOWER(cm.model_name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
+            WHEN LOWER(v.variant_name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
+            WHEN LOWER(m.name || ' ' || cm.model_name) LIKE ${'%' + trimmedSearchTerm + '%'} THEN 500
+            
+            -- Default to lowest score
+            ELSE 0
+          END AS search_score`;
       }
     }
     

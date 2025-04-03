@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pkg from 'pg';
 const { Pool } = pkg;
 import * as schema from "@shared/schema";
-import { MemoryStorage } from "./memory-storage";
+import { DatabaseStorage } from "./storage";
 
 // This will be set to true if PostgreSQL connection is successful
 let dbConnected = false;
@@ -12,7 +12,8 @@ async function attemptPostgresConnection() {
   try {
     // Use direct connection parameters instead of connection string
     if (!process.env.PGHOST || !process.env.PGUSER || !process.env.PGPASSWORD || !process.env.PGDATABASE) {
-      console.warn("Database environment variables are not completely set");
+      console.error("DATABASE ERROR: Environment variables are not completely set");
+      process.exit(1);
       return false;
     }
 
@@ -50,10 +51,14 @@ async function attemptPostgresConnection() {
     }
   } catch (err) {
     console.error('Database connection failed:', err);
-    dbConnected = false;
+    console.error('The application requires a PostgreSQL database connection to function.');
+    process.exit(1);
     return { success: false };
   }
   
+  console.error('Database connection failed with no specific error.');
+  console.error('The application requires a PostgreSQL database connection to function.');
+  process.exit(1);
   return { success: false };
 }
 
@@ -66,16 +71,14 @@ const pool = connectionAttempt.success ? connectionAttempt.pool : null;
 // For type safety, we'll create a db instance even if it might not be used
 export const db = pool ? drizzle(pool, { schema }) : null;
 
-// IMPORTANT: This function allows the server to gracefully fall back to memory storage if PostgreSQL fails,
-// but still use PostgreSQL if it becomes available later
+// This function returns the database storage implementation
 export async function getStorage() {
-  // If we've already successfully connected to PostgreSQL, use DatabaseStorage
-  if (dbConnected && db) {
-    const { DatabaseStorage } = await import('./storage');
-    return new DatabaseStorage();
+  // Verify we have a database connection
+  if (!dbConnected || !db) {
+    console.error('ERROR: No database connection available');
+    process.exit(1);
   }
   
-  // If PostgreSQL connection failed, fall back to MemoryStorage
-  console.warn('Using MemoryStorage as fallback due to database connection issues');
-  return new MemoryStorage();
+  // Return the PostgreSQL database storage implementation
+  return new DatabaseStorage();
 }
