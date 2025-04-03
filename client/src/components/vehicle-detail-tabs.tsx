@@ -10,13 +10,9 @@ export function RangeEstimatorTab({ vehicle }: TabProps) {
   return (
     <div className="mt-8">
       <h3 className="text-base font-medium text-gray-900 mb-4">Real-World Range Estimator</h3>
-      <p className="text-sm text-gray-500 mb-4">Estimate how far you can drive in different conditions</p>
+      <p className="text-sm text-gray-500 mb-4">Estimate how far you can drive based on environmental and driving factors</p>
       
-      <RangeEstimator 
-        vehicle={vehicle} 
-        officialRange={vehicle.officialRange} 
-        realWorldRange={vehicle.realWorldRange} 
-      />
+      <RangeEstimator vehicle={vehicle} />
     </div>
   );
 }
