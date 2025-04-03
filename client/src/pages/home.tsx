@@ -1,14 +1,16 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { VehicleFilter, VehicleWithDetails } from "@shared/types";
 import FilterSection from "@/components/filter-section";
 import VehicleCard from "@/components/vehicle-card";
 import Pagination from "@/components/pagination";
 import { useToast } from "@/hooks/use-toast";
+import { useUrlFilters } from "@/hooks/use-url-filters";
 
 export default function Home() {
   const { toast } = useToast();
-  const [filter, setFilter] = useState<VehicleFilter>({
+  // Use the URL filters hook to manage filter state with URL persistence
+  const { filter, setFilter } = useUrlFilters({
     page: 1,
     perPage: 10,
     sortBy: "popular",
@@ -40,12 +42,12 @@ export default function Home() {
 
   // Handle filter changes
   const handleFilterChange = (newFilter: Partial<VehicleFilter>) => {
-    setFilter((prev) => ({ ...prev, ...newFilter }));
+    setFilter(newFilter);
   };
 
   // Handle pagination
   const handlePageChange = (page: number) => {
-    setFilter((prev) => ({ ...prev, page }));
+    setFilter({ page });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
