@@ -172,7 +172,10 @@ async function importCarModels() {
       // Map body style name to ID, default to 1 (Sedan) if not found
       const bodyStyleId = bodyStylesMap[record["Body Style"]] || 1;
       
-      valueStrings.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6})`);
+      // Convert boot space to number or null
+      const bootSpace = record["Boot Space Ltrs"] ? parseInt(record["Boot Space Ltrs"]) : null;
+      
+      valueStrings.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6}, $${paramIndex + 7})`);
       values.push(
         id, 
         manufacturerId, 
@@ -180,21 +183,22 @@ async function importCarModels() {
         bodyStyleId,
         record["Image Link"] || null,
         parseInt(record["Start Year"]) || 2020,
+        bootSpace, // Add boot space from CSV
         0 // viewCount default
       );
-      paramIndex += 7;
+      paramIndex += 8;
       id++;
     }
     
     if (values.length > 0) {
       const query = `
-        INSERT INTO car_models (id, manufacturer_id, model_name, body_style_id, image, manufacturing_start_year, view_count) 
+        INSERT INTO car_models (id, manufacturer_id, model_name, body_style_id, image, manufacturing_start_year, boot_space, view_count) 
         VALUES ${valueStrings.join(', ')}
       `;
       await pool.query(query, values);
     }
     
-    log(`Imported ${values.length / 7} car models`);
+    log(`Imported ${values.length / 8} car models`);
   } catch (error) {
     log(`Error importing car models: ${error.message}`);
     throw error;
