@@ -8,6 +8,7 @@ import VehicleDetails from "@/pages/vehicle-details";
 import AdminPage from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
 import ComparePage from "@/pages/compare";
+import EstimatorPage from "@/pages/estimator";
 import Header from "@/components/header";
 import { ComparisonProvider } from "@/hooks/use-comparison";
 import ComparisonBar from "@/components/comparison-bar";
@@ -69,6 +70,10 @@ function Router() {
         <Route path="/compare">
           <Header />
           <ComparePage />
+        </Route>
+        <Route path="/estimator">
+          <Header />
+          <EstimatorPage />
         </Route>
         <Route>
           <Header />
