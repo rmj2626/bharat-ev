@@ -609,12 +609,54 @@ export class MemoryStorage implements IStorage {
 
     // Search term filtering
     if (filter.searchTerm) {
-      const searchTermLower = filter.searchTerm.toLowerCase();
-      filteredVehicles = filteredVehicles.filter(v => 
-        v.modelName.toLowerCase().includes(searchTermLower) ||
-        v.variantName.toLowerCase().includes(searchTermLower) ||
-        v.manufacturerName.toLowerCase().includes(searchTermLower)
-      );
+      // Trim the search term and handle whitespace properly
+      const trimmedSearchTerm = filter.searchTerm.trim();
+      
+      if (trimmedSearchTerm) {
+        // Split search terms by whitespace to handle combined searches like "MG Comet"
+        const searchTerms = trimmedSearchTerm.split(/\s+/);
+        
+        if (searchTerms.length === 1) {
+          // Single term search
+          const searchTermLower = trimmedSearchTerm.toLowerCase();
+          filteredVehicles = filteredVehicles.filter(v => 
+            v.modelName.toLowerCase().includes(searchTermLower) ||
+            v.variantName.toLowerCase().includes(searchTermLower) ||
+            v.manufacturerName.toLowerCase().includes(searchTermLower)
+          );
+        } else {
+          // Multi-term search
+          // Try exact match with full search term
+          const exactTermLower = trimmedSearchTerm.toLowerCase();
+          const exactMatches = filteredVehicles.filter(v => 
+            v.modelName.toLowerCase().includes(exactTermLower) ||
+            v.variantName.toLowerCase().includes(exactTermLower) ||
+            v.manufacturerName.toLowerCase().includes(exactTermLower) ||
+            // Combined manufacturer + model match
+            (`${v.manufacturerName} ${v.modelName}`).toLowerCase().includes(exactTermLower)
+          );
+          
+          if (exactMatches.length > 0) {
+            // If we have exact matches, use those
+            filteredVehicles = exactMatches;
+          } else {
+            // Otherwise, try matching individual terms - must match ALL terms
+            filteredVehicles = filteredVehicles.filter(v => {
+              // Each search term must match at least one of the attributes
+              return searchTerms.every(term => {
+                if (term.length <= 1) return true; // Skip very short terms
+                
+                const termLower = term.toLowerCase();
+                return (
+                  v.modelName.toLowerCase().includes(termLower) ||
+                  v.variantName.toLowerCase().includes(termLower) ||
+                  v.manufacturerName.toLowerCase().includes(termLower)
+                );
+              });
+            });
+          }
+        }
+      }
     }
 
     // Apply sorting

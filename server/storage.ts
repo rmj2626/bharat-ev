@@ -559,12 +559,57 @@ export class DatabaseStorage implements IStorage {
     
     // Text search
     if (filter.searchTerm) {
-      const searchPattern = `%${filter.searchTerm}%`;
-      conditions = sql`${conditions} AND (
-        LOWER(m.name) LIKE LOWER(${searchPattern})
-        OR LOWER(cm.model_name) LIKE LOWER(${searchPattern})
-        OR LOWER(v.variant_name) LIKE LOWER(${searchPattern})
-      )`;
+      // Trim the search term and handle whitespace properly
+      const trimmedSearchTerm = filter.searchTerm.trim();
+      
+      if (trimmedSearchTerm) {
+        // Split search terms by whitespace to handle combined searches like "MG Comet"
+        const searchTerms = trimmedSearchTerm.split(/\s+/);
+        
+        if (searchTerms.length === 1) {
+          // Single term search
+          const searchPattern = `%${trimmedSearchTerm}%`;
+          conditions = sql`${conditions} AND (
+            LOWER(m.name) LIKE LOWER(${searchPattern})
+            OR LOWER(cm.model_name) LIKE LOWER(${searchPattern})
+            OR LOWER(v.variant_name) LIKE LOWER(${searchPattern})
+          )`;
+        } else {
+          // Multi-term search - create conditions for each term
+          const searchConditions = [];
+          
+          // First, try exact match with the entire search term
+          const exactPattern = `%${trimmedSearchTerm}%`;
+          searchConditions.push(sql`(
+            LOWER(m.name) LIKE LOWER(${exactPattern})
+            OR LOWER(cm.model_name) LIKE LOWER(${exactPattern})
+            OR LOWER(v.variant_name) LIKE LOWER(${exactPattern})
+          )`);
+          
+          // Then try combinations of manufacturer + model
+          const manufacturerModelCondition = sql`(
+            EXISTS (
+              SELECT 1 
+              WHERE LOWER(m.name || ' ' || cm.model_name) LIKE LOWER(${`%${trimmedSearchTerm}%`})
+            )
+          )`;
+          searchConditions.push(manufacturerModelCondition);
+          
+          // Add individual terms
+          for (const term of searchTerms) {
+            if (term.length > 1) { // Skip very short terms
+              const termPattern = `%${term}%`;
+              searchConditions.push(sql`(
+                LOWER(m.name) LIKE LOWER(${termPattern})
+                OR LOWER(cm.model_name) LIKE LOWER(${termPattern})
+                OR LOWER(v.variant_name) LIKE LOWER(${termPattern})
+              )`);
+            }
+          }
+          
+          conditions = sql`${conditions} AND (${sql.join(searchConditions, sql` OR `)})`;
+        }
+      }
     }
     
     // Add conditions to query
