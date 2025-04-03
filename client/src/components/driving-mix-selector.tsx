@@ -28,6 +28,40 @@ export default function DrivingMixSelector({
     setDragging(index);
   };
 
+  // Update divider position and maintain constraints
+  const updateDividerPosition = (percentage: number) => {
+    setDividers(prevDividers => {
+      const newDividers = [...prevDividers];
+      
+      // Ensure the divider being moved doesn't cross other dividers
+      if (dragging === 0) {
+        // First divider: move between 0 and second divider
+        newDividers[0] = Math.min(percentage, newDividers[1]);
+        
+        // Calculate new percentages
+        const newCity = newDividers[0];
+        const newState = newDividers[1] - newDividers[0];
+        const newNational = 100 - newDividers[1];
+        
+        // Update the parent component with new percentages
+        onMixChange(newCity, newState, newNational);
+      } else if (dragging === 1) {
+        // Second divider: move between first divider and 100
+        newDividers[1] = Math.max(percentage, newDividers[0]);
+        
+        // Calculate new percentages
+        const newCity = newDividers[0];
+        const newState = newDividers[1] - newDividers[0];
+        const newNational = 100 - newDividers[1];
+        
+        // Update the parent component with new percentages
+        onMixChange(newCity, newState, newNational);
+      }
+      
+      return newDividers;
+    });
+  };
+
   // Handle mouse move while dragging
   const handleMouseMove = (e: MouseEvent) => {
     if (dragging === null || !containerRef.current) return;
@@ -56,40 +90,6 @@ export default function DrivingMixSelector({
     percentage = Math.max(0, Math.min(100, percentage));
     
     updateDividerPosition(percentage);
-  };
-
-  // Update divider position and maintain constraints
-  const updateDividerPosition = (percentage: number) => {
-    setDividers(prevDividers => {
-      const newDividers = [...prevDividers];
-      
-      // Ensure the divider being moved doesn't cross other dividers
-      if (dragging === 0) {
-        // First divider: move between 0 and second divider
-        newDividers[0] = Math.min(percentage, newDividers[1] - 1);
-        
-        // Calculate new percentages
-        const newCity = newDividers[0];
-        const newState = newDividers[1] - newDividers[0];
-        const newNational = 100 - newDividers[1];
-        
-        // Update the parent component with new percentages
-        onMixChange(newCity, newState, newNational);
-      } else if (dragging === 1) {
-        // Second divider: move between first divider and 100
-        newDividers[1] = Math.max(percentage, newDividers[0] + 1);
-        
-        // Calculate new percentages
-        const newCity = newDividers[0];
-        const newState = newDividers[1] - newDividers[0];
-        const newNational = 100 - newDividers[1];
-        
-        // Update the parent component with new percentages
-        onMixChange(newCity, newState, newNational);
-      }
-      
-      return newDividers;
-    });
   };
 
   // Stop dragging when mouse/touch is released
@@ -170,7 +170,7 @@ export default function DrivingMixSelector({
           aria-label="Divider between city and state highway"
           role="slider"
           aria-valuemin={0}
-          aria-valuemax={99}
+          aria-valuemax={100}
           aria-valuenow={cityPercent}
         />
         
@@ -182,7 +182,7 @@ export default function DrivingMixSelector({
           onTouchStart={handleDividerMouseDown(1)}
           aria-label="Divider between state and national highway"
           role="slider"
-          aria-valuemin={1}
+          aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={cityPercent + statePercent}
         />
