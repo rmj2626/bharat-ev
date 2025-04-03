@@ -56,7 +56,6 @@ export const carModels = pgTable("car_models", {
   bootSpace: integer("boot_space"), // in liters
   manufacturingStartYear: integer("manufacturing_start_year").notNull(),
   manufacturingEndYear: integer("manufacturing_end_year"),
-  viewCount: integer("view_count").default(0),
 });
 
 // Vehicles (Variants)
@@ -84,6 +83,7 @@ export const vehicles = pgTable("vehicles", {
   v2lSupport: boolean("v2l_support").default(false),
   v2lOutputPower: integer("v2l_output_power"), // in watts
   price: doublePrecision("price"), // in lakhs
+  viewCount: integer("view_count").default(0), // View count for popularity
 });
 
 // Insert Schemas

@@ -121,6 +121,7 @@ export interface VehicleWithDetails {
   batteryWarrantyYears: number | null;
   batteryWarrantyKm: number | null;
   bootSpace: number | null; // Added bootSpace field
+  viewCount: number | null; // Added viewCount field for popularity tracking
 }
 
 export interface PaginatedResult<T> {

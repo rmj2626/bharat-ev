@@ -175,7 +175,7 @@ async function importCarModels() {
       // Convert boot space to number or null
       const bootSpace = record["Boot Space Ltrs"] ? parseInt(record["Boot Space Ltrs"]) : null;
       
-      valueStrings.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6}, $${paramIndex + 7})`);
+      valueStrings.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6})`);
       values.push(
         id, 
         manufacturerId, 
@@ -183,22 +183,21 @@ async function importCarModels() {
         bodyStyleId,
         record["Image Link"] || null,
         parseInt(record["Start Year"]) || 2020,
-        bootSpace, // Add boot space from CSV
-        0 // viewCount default
+        bootSpace // Add boot space from CSV
       );
-      paramIndex += 8;
+      paramIndex += 7;
       id++;
     }
     
     if (values.length > 0) {
       const query = `
-        INSERT INTO car_models (id, manufacturer_id, model_name, body_style_id, image, manufacturing_start_year, boot_space, view_count) 
+        INSERT INTO car_models (id, manufacturer_id, model_name, body_style_id, image, manufacturing_start_year, boot_space) 
         VALUES ${valueStrings.join(', ')}
       `;
       await pool.query(query, values);
     }
     
-    log(`Imported ${values.length / 8} car models`);
+    log(`Imported ${values.length / 7} car models`);
   } catch (error) {
     log(`Error importing car models: ${error.message}`);
     throw error;
@@ -281,7 +280,7 @@ async function importVehicles() {
       const rangeRatingId = rangeRatingSystemsMap[record["Range Rating System"]] || null;
       
       // Prepare parameters for bulk insert
-      valueStrings.push(`($${paramIndex}, $${paramIndex+1}, $${paramIndex+2}, $${paramIndex+3}, $${paramIndex+4}, $${paramIndex+5}, $${paramIndex+6}, $${paramIndex+7}, $${paramIndex+8}, $${paramIndex+9}, $${paramIndex+10}, $${paramIndex+11}, $${paramIndex+12}, $${paramIndex+13}, $${paramIndex+14}, $${paramIndex+15}, $${paramIndex+16}, $${paramIndex+17}, $${paramIndex+18}, $${paramIndex+19}, $${paramIndex+20}, $${paramIndex+21}, $${paramIndex+22})`);
+      valueStrings.push(`($${paramIndex}, $${paramIndex+1}, $${paramIndex+2}, $${paramIndex+3}, $${paramIndex+4}, $${paramIndex+5}, $${paramIndex+6}, $${paramIndex+7}, $${paramIndex+8}, $${paramIndex+9}, $${paramIndex+10}, $${paramIndex+11}, $${paramIndex+12}, $${paramIndex+13}, $${paramIndex+14}, $${paramIndex+15}, $${paramIndex+16}, $${paramIndex+17}, $${paramIndex+18}, $${paramIndex+19}, $${paramIndex+20}, $${paramIndex+21}, $${paramIndex+22}, $${paramIndex+23})`);
       
       values.push(
         vehicleId,
@@ -306,10 +305,11 @@ async function importVehicles() {
         record["Weight"] ? Math.round(parseFloat(record["Weight"])) : null,
         record["v2l output kw AC"] && parseFloat(record["v2l output kw AC"]) > 0, // v2l_support boolean
         record["v2l output kw AC"] ? Math.round(parseFloat(record["v2l output kw AC"]) * 1000) : null, // Convert kW to W and round
-        record["price (in lakhs)"] ? parseFloat(record["price (in lakhs)"]) : null
+        record["price (in lakhs)"] ? parseFloat(record["price (in lakhs)"]) : null,
+        0 // Initialize viewCount to 0
       );
 
-      paramIndex += 23;
+      paramIndex += 24;
       vehicleId++;
       totalImported++;
     }
@@ -322,7 +322,7 @@ async function importVehicles() {
           official_range, real_world_range, efficiency, drive_type_id, battery_type_id,
           range_rating_id, battery_warranty_years, battery_warranty_km,
           horsepower, torque, acceleration, top_speed, fast_charging_capacity, 
-          fast_charging_time, weight, v2l_support, v2l_output_power, price
+          fast_charging_time, weight, v2l_support, v2l_output_power, price, view_count
         ) VALUES ${valueStrings.join(', ')}
       `;
       

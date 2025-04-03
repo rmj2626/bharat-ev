@@ -273,9 +273,9 @@ export class DatabaseStorage implements IStorage {
   async incrementViewCount(id: number): Promise<void> {
     const safeDb = ensureDb();
     await safeDb
-      .update(carModels)
-      .set({ viewCount: sql`${carModels.viewCount} + 1` })
-      .where(eq(carModels.id, id));
+      .update(vehicles)
+      .set({ viewCount: sql`${vehicles.viewCount} + 1` })
+      .where(eq(vehicles.id, id));
   }
 
   async deleteCarModel(id: number): Promise<void> {
@@ -337,6 +337,7 @@ export class DatabaseStorage implements IStorage {
         v.v2l_support as "v2lSupport",
         v.v2l_output_power as "v2lOutputPower",
         v.price as "price",
+        v.view_count as "viewCount",
         m.id as "manufacturerId",
         m.name as "manufacturerName",
         cm.model_name as "modelName",
@@ -379,8 +380,8 @@ export class DatabaseStorage implements IStorage {
     // Safely cast the row to VehicleWithDetails
     const vehicle = rows[0] as unknown as VehicleWithDetails;
 
-    // Increment view count for the model
-    await this.incrementViewCount(vehicle.modelId);
+    // Increment view count for the vehicle
+    await this.incrementViewCount(id);
 
     return vehicle;
   }
@@ -414,6 +415,7 @@ export class DatabaseStorage implements IStorage {
         v.v2l_support as "v2lSupport",
         v.v2l_output_power as "v2lOutputPower",
         v.price as "price",
+        v.view_count as "viewCount",
         m.id as "manufacturerId",
         m.name as "manufacturerName",
         cm.model_name as "modelName",
@@ -581,7 +583,7 @@ export class DatabaseStorage implements IStorage {
     // Simple sort by selected field
     switch (filter.sortBy) {
       case 'popular':
-        orderBy = sql` ORDER BY cm.view_count DESC NULLS LAST`;
+        orderBy = sql` ORDER BY v.view_count DESC NULLS LAST`;
         break;
       case 'price_low':
         orderBy = sql` ORDER BY v.price ASC NULLS LAST`;
@@ -617,7 +619,7 @@ export class DatabaseStorage implements IStorage {
         orderBy = sql` ORDER BY v.torque DESC NULLS LAST`;
         break;
       default:
-        orderBy = sql` ORDER BY cm.view_count DESC NULLS LAST`;
+        orderBy = sql` ORDER BY v.view_count DESC NULLS LAST`;
     }
     
     query = sql`${query} ${orderBy}`;
