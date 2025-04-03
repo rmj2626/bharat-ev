@@ -201,7 +201,7 @@ async function importCarModels() {
   }
 }
 
-// Import vehicles in batches
+// Import all vehicles at once - production ready
 async function importVehicles() {
   try {
     log('Importing vehicles...');
@@ -245,87 +245,89 @@ async function importVehicles() {
       rangeRatingSystemsMap[rrs.name] = rrs.id;
     });
     
-    // Process in batches
-    const BATCH_SIZE = 20; // Smaller batch size for safer imports
-    let totalImported = 0;
+    // Prepare bulk insert values
+    const valueStrings = [];
+    const values = [];
+    let paramIndex = 1;
     let vehicleId = 1; // Auto-increment ID
+    let totalImported = 0;
+
+    // Process all vehicles at once for production environment
+    log(`Processing all ${records.length} vehicles at once`);
     
-    for (let i = 0; i < records.length; i += BATCH_SIZE) {
-      const batch = records.slice(i, i + BATCH_SIZE);
-      log(`Processing batch ${i / BATCH_SIZE + 1} of ${Math.ceil(records.length / BATCH_SIZE)} (${batch.length} vehicles)`);
-      
-      // Process each vehicle in the batch
-      for (const record of batch) {
-        // Find manufacturer ID
-        const manufacturerId = manufacturersMap[record["Manufacturer Name"]];
-        if (!manufacturerId) {
-          log(`Warning: Manufacturer "${record["Manufacturer Name"]}" not found, skipping vehicle ${record["Variant Name"]}`);
-          continue;
-        }
-        
-        // Find model ID using manufacturer ID and model name
-        const modelKey = `${manufacturerId}_${record["Model Name"]}`;
-        const modelId = modelsMap[modelKey];
-        if (!modelId) {
-          log(`Warning: Model "${record["Model Name"]}" for manufacturer ID ${manufacturerId} not found, skipping vehicle ${record["Variant Name"]}`);
-          continue;
-        }
-        
-        // Map battery type, drive type and range rating system to their IDs
-        const batteryTypeId = batteryTypesMap[record["Battery Type"]] || null;
-        const driveTypeId = driveTypesMap[record["Drive Type"]] || null;
-        const rangeRatingId = rangeRatingSystemsMap[record["Range Rating System"]] || null;
-        
-        // Insert vehicle
-        const query = `
-          INSERT INTO vehicles (
-            id, model_id, variant_name, battery_capacity, usable_battery_capacity,
-            official_range, real_world_range, efficiency, drive_type_id, battery_type_id,
-            range_rating_id, battery_warranty_years, battery_warranty_km,
-            horsepower, torque, acceleration, top_speed, fast_charging_capacity, 
-            fast_charging_time, weight, v2l_support, v2l_output_power, price
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)
-        `;
-        
-        const values = [
-          vehicleId,
-          modelId,
-          record["Variant Name"],
-          record["Battery Capacity"] ? parseFloat(record["Battery Capacity"]) : null,
-          record["Useable Capacity"] ? parseFloat(record["Useable Capacity"]) : null,
-          record["Official Range"] ? Math.round(parseFloat(record["Official Range"])) : null,
-          record["Real Range"] ? Math.round(parseFloat(record["Real Range"])) : null,
-          record["Efficiency"] ? parseFloat(record["Efficiency"]) : null,
-          driveTypeId,
-          batteryTypeId,
-          rangeRatingId,
-          record["Warranty Years"] ? parseInt(record["Warranty Years"]) : null,
-          record["Warranty Kms"] ? parseInt(record["Warranty Kms"]) : null,
-          record["Horsepower"] ? parseFloat(record["Horsepower"]) : null,
-          record["Torque"] ? Math.round(parseFloat(record["Torque"])) : null,
-          record["0-100"] ? parseFloat(record["0-100"]) : null,
-          record["Top speed"] ? Math.round(parseFloat(record["Top speed"])) : null,
-          record["Fast Charging DC KW"] ? Math.round(parseFloat(record["Fast Charging DC KW"])) : null,
-          record["10-80 time"] ? Math.round(parseFloat(record["10-80 time"])) : null,
-          record["Weight"] ? Math.round(parseFloat(record["Weight"])) : null,
-          record["v2l output kw AC"] && parseFloat(record["v2l output kw AC"]) > 0, // v2l_support boolean
-          record["v2l output kw AC"] ? Math.round(parseFloat(record["v2l output kw AC"]) * 1000) : null, // Convert kW to W and round
-          record["price (in lakhs)"] ? parseFloat(record["price (in lakhs)"]) : null
-        ];
-        
-        try {
-          await pool.query(query, values);
-          totalImported++;
-          vehicleId++;
-        } catch (vehicleError) {
-          // Log the error with more detailed information
-          log(`Error importing vehicle ${record["Variant Name"]}: ${vehicleError.message}`);
-          // Continue with next vehicle rather than stopping the import
-        }
+    for (const record of records) {
+      // Find manufacturer ID
+      const manufacturerId = manufacturersMap[record["Manufacturer Name"]];
+      if (!manufacturerId) {
+        log(`Warning: Manufacturer "${record["Manufacturer Name"]}" not found, skipping vehicle ${record["Variant Name"]}`);
+        continue;
       }
+      
+      // Find model ID using manufacturer ID and model name
+      const modelKey = `${manufacturerId}_${record["Model Name"]}`;
+      const modelId = modelsMap[modelKey];
+      if (!modelId) {
+        log(`Warning: Model "${record["Model Name"]}" for manufacturer ID ${manufacturerId} not found, skipping vehicle ${record["Variant Name"]}`);
+        continue;
+      }
+      
+      // Map battery type, drive type and range rating system to their IDs
+      const batteryTypeId = batteryTypesMap[record["Battery Type"]] || null;
+      const driveTypeId = driveTypesMap[record["Drive Type"]] || null;
+      const rangeRatingId = rangeRatingSystemsMap[record["Range Rating System"]] || null;
+      
+      // Prepare parameters for bulk insert
+      valueStrings.push(`($${paramIndex}, $${paramIndex+1}, $${paramIndex+2}, $${paramIndex+3}, $${paramIndex+4}, $${paramIndex+5}, $${paramIndex+6}, $${paramIndex+7}, $${paramIndex+8}, $${paramIndex+9}, $${paramIndex+10}, $${paramIndex+11}, $${paramIndex+12}, $${paramIndex+13}, $${paramIndex+14}, $${paramIndex+15}, $${paramIndex+16}, $${paramIndex+17}, $${paramIndex+18}, $${paramIndex+19}, $${paramIndex+20}, $${paramIndex+21}, $${paramIndex+22})`);
+      
+      values.push(
+        vehicleId,
+        modelId,
+        record["Variant Name"],
+        record["Battery Capacity"] ? parseFloat(record["Battery Capacity"]) : null,
+        record["Useable Capacity"] ? parseFloat(record["Useable Capacity"]) : null,
+        record["Official Range"] ? Math.round(parseFloat(record["Official Range"])) : null,
+        record["Real Range"] ? Math.round(parseFloat(record["Real Range"])) : null,
+        record["Efficiency"] ? parseFloat(record["Efficiency"]) : null,
+        driveTypeId,
+        batteryTypeId,
+        rangeRatingId,
+        record["Warranty Years"] ? parseInt(record["Warranty Years"]) : null,
+        record["Warranty Kms"] ? parseInt(record["Warranty Kms"]) : null,
+        record["Horsepower"] ? parseFloat(record["Horsepower"]) : null,
+        record["Torque"] ? Math.round(parseFloat(record["Torque"])) : null,
+        record["0-100"] ? parseFloat(record["0-100"]) : null,
+        record["Top speed"] ? Math.round(parseFloat(record["Top speed"])) : null,
+        record["Fast Charging DC KW"] ? Math.round(parseFloat(record["Fast Charging DC KW"])) : null,
+        record["10-80 time"] ? Math.round(parseFloat(record["10-80 time"])) : null,
+        record["Weight"] ? Math.round(parseFloat(record["Weight"])) : null,
+        record["v2l output kw AC"] && parseFloat(record["v2l output kw AC"]) > 0, // v2l_support boolean
+        record["v2l output kw AC"] ? Math.round(parseFloat(record["v2l output kw AC"]) * 1000) : null, // Convert kW to W and round
+        record["price (in lakhs)"] ? parseFloat(record["price (in lakhs)"]) : null
+      );
+
+      paramIndex += 23;
+      vehicleId++;
+      totalImported++;
     }
     
-    log(`Imported ${totalImported} vehicles successfully`);
+    // Execute the bulk insert if we have vehicles to insert
+    if (values.length > 0) {
+      const query = `
+        INSERT INTO vehicles (
+          id, model_id, variant_name, battery_capacity, usable_battery_capacity,
+          official_range, real_world_range, efficiency, drive_type_id, battery_type_id,
+          range_rating_id, battery_warranty_years, battery_warranty_km,
+          horsepower, torque, acceleration, top_speed, fast_charging_capacity, 
+          fast_charging_time, weight, v2l_support, v2l_output_power, price
+        ) VALUES ${valueStrings.join(', ')}
+      `;
+      
+      await pool.query(query, values);
+      log(`Imported ${totalImported} vehicles successfully in a single transaction`);
+    } else {
+      log('No vehicles to import');
+    }
+    
   } catch (error) {
     log(`Error importing vehicles: ${error.message}`);
     throw error;

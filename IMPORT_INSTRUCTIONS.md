@@ -51,6 +51,16 @@ If you encounter issues during the import process:
 
 3. **Import Errors**: Check the console output for specific error messages during import.
 
+## Production Optimization
+
+For production environments, the import script has been optimized to import vehicles in a single transaction rather than in batches. This provides:
+
+1. **Better Performance**: A single transaction is faster and more efficient.
+2. **Atomic Operations**: All vehicles are imported as a single atomic operation.
+3. **Reduced Database Load**: Fewer separate transactions means less overhead on the database server.
+
+The batching logic previously used was primarily a safeguard for development environments with potential connectivity issues (like Replit). In a real production PostgreSQL server, the script is now optimized for maximum performance.
+
 ## Manual Import (if needed)
 
 If you need to import the data manually:
