@@ -306,7 +306,7 @@ async function importVehicles() {
         record["v2l output kw AC"] && parseFloat(record["v2l output kw AC"]) > 0, // v2l_support boolean
         record["v2l output kw AC"] ? Math.round(parseFloat(record["v2l output kw AC"]) * 1000) : null, // Convert kW to W and round
         record["price (in lakhs)"] ? parseFloat(record["price (in lakhs)"]) : null,
-        0 // Initialize viewCount to 0
+        record["view_count"] ? parseInt(record["view_count"]) : 0 // Use view_count from CSV or 0 if not available
       );
 
       paramIndex += 24;

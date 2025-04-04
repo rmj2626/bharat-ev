@@ -97,20 +97,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Process and convert query parameters to appropriate types
       for (const [key, value] of Object.entries(req.query)) {
-        // Special handling for price filters - these need special conversion since
-        // UI shows values in lakhs but DB stores as raw rupees
+        // Special handling for price filters
+        // Both UI and DB use lakhs as the unit
         if (key === 'minPrice' || key === 'maxPrice') {
-          // Convert price from lakhs (UI) to rupees (DB)
-          // Example: UI shows 5L-10L, but in DB it's stored as 500000-1000000
+          // Just convert to number without multiplication
           const priceInLakhs = value ? Number(value) : undefined;
-          
-          if (priceInLakhs !== undefined) {
-            // Convert lakhs to raw rupees for DB
-            const priceInRupees = priceInLakhs * 100000;
-            queryParams[key] = priceInRupees;
-          } else {
-            queryParams[key] = undefined;
-          }
+          queryParams[key] = priceInLakhs;
         }
         // Handle other numeric params
         else if (key === 'page' || key === 'perPage' || 

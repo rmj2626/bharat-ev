@@ -82,7 +82,7 @@ export const vehicles = pgTable("vehicles", {
   weight: integer("weight"), // in kg
   v2lSupport: boolean("v2l_support").default(false),
   v2lOutputPower: integer("v2l_output_power"), // in watts
-  price: doublePrecision("price"), // in lakhs
+  price: doublePrecision("price"), // in lakhs (1 lakh = 100,000 rupees)
   viewCount: integer("view_count").default(0), // View count for popularity
 });
 
