@@ -31,28 +31,26 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300">
-      <div className="flex flex-col md:flex-row md:h-full">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 h-full">
+      <div className="flex flex-col md:flex-row h-full">
         {/* Vehicle Image - Fill entire height in desktop view without margins */}
-        <div className="relative cursor-pointer md:w-1/4 overflow-hidden" style={{ padding: 0 }}>
+        <div className="relative cursor-pointer md:w-1/3 overflow-hidden h-full" style={{ padding: 0 }}>
           <Link href={`/vehicles/${vehicle.id}`} className="block h-full">
-            <div className="md:h-full w-full bg-gray-100" style={{ 
+            <div className="h-full w-full bg-muted/30" style={{ 
               aspectRatio: '16/9', 
               padding: 0, 
               margin: 0, 
-              display: 'block',
-              position: 'relative' 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
               <img
                 src={vehicle.image || "https://www.svgrepo.com/show/508699/landscape-placeholder.svg"}
                 alt={`${vehicle.manufacturerName} ${vehicle.modelName} ${vehicle.variantName}`}
                 style={{ 
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
                   width: '100%', 
                   height: '100%', 
-                  objectFit: 'contain'
+                  objectFit: 'cover'
                 }}
               />
             </div>
@@ -78,29 +76,29 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
         </div>
 
         {/* Vehicle Details */}
-        <div className="flex-1 p-4 md:p-6">
+        <div className="flex-1 p-3 md:p-4">
           <div className="flex flex-col md:flex-row md:justify-between">
             <div>
               <Link href={`/vehicles/${vehicle.id}`}>
-                <h2 className="text-xl font-medium text-primary hover:text-accent cursor-pointer font-styreneB">
+                <h2 className="text-lg font-medium text-primary hover:text-accent cursor-pointer font-styreneB">
                   {vehicle.manufacturerName} {vehicle.modelName} {vehicle.variantName}
                 </h2>
               </Link>
-              <p className="text-sm text-muted-foreground mb-4 font-tiempos">
+              <p className="text-xs text-muted-foreground mb-2 font-tiempos">
                 {vehicle.bodyStyleName} • {vehicle.manufacturingStartYear}
                 {vehicle.manufacturingEndYear ? `-${vehicle.manufacturingEndYear}` : ""}
               </p>
             </div>
-            <div className="mt-2 md:mt-0 inline-flex md:flex-col items-center md:items-end">
-              <span className="text-xl font-medium text-primary font-styreneB">
+            <div className="mt-1 md:mt-0 inline-flex md:flex-col items-center md:items-end">
+              <span className="text-lg font-medium text-primary font-styreneB">
                 {formatPrice(vehicle.price)}
               </span>
-              <span className="ml-2 md:ml-0 text-sm text-muted-foreground font-tiempos">Ex-showroom</span>
+              <span className="ml-2 md:ml-0 text-xs text-muted-foreground font-tiempos">Ex-showroom</span>
             </div>
           </div>
 
           {/* First row: Real Range, Battery, Charging Time, Efficiency, Battery Type */}
-          <div className="mt-4 grid grid-cols-5 gap-2 text-xs sm:text-sm">
+          <div className="mt-2 grid grid-cols-5 gap-1 text-xs">
             <VehicleSpecItem 
               label="Real Range" 
               value={vehicle.realWorldRange ? `${vehicle.realWorldRange} km` : "N/A"} 
@@ -124,7 +122,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
           </div>
 
           {/* Second row: Power, Torque, 0-100 km/h, Top Speed, Weight */}
-          <div className="mt-3 grid grid-cols-5 gap-2 text-xs sm:text-sm">
+          <div className="mt-2 grid grid-cols-5 gap-1 text-xs">
             <VehicleSpecItem 
               label="Power" 
               value={vehicle.horsepower ? `${vehicle.horsepower} BHP` : "N/A"} 
@@ -147,9 +145,9 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
             />
           </div>
 
-          <div className="mt-4 flex w-full">
+          <div className="mt-3 flex w-full gap-2">
             <Link href={`/vehicles/${vehicle.id}`} className="w-full md:w-auto">
-              <Button variant="accent" className="w-full md:w-auto">
+              <Button variant="default" className="w-full md:w-auto bg-black hover:bg-black/90 text-white">
                 View Details
               </Button>
             </Link>
