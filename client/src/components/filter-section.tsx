@@ -133,7 +133,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
             <div className="w-1/2 pr-2">
               <button
                 type="button"
-                className="w-full flex justify-between items-center px-4 py-2 border border-border rounded-md shadow-sm bg-background text-sm font-medium text-foreground font-styreneA hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
+                className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-background text-sm font-medium text-foreground font-styreneA hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
                 onClick={() => setIsManufacturerMenuOpen(!isManufacturerMenuOpen)}
               >
                 <span>Manufacturer</span>
@@ -143,7 +143,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
             <div className="w-1/2 pl-2">
               <button
                 type="button"
-                className="w-full flex justify-between items-center px-4 py-2 border border-border rounded-md shadow-sm bg-background text-sm font-medium text-foreground font-styreneA hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
+                className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-background text-sm font-medium text-foreground font-styreneA hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
                 onClick={() => setIsMoreFiltersOpen(!isMoreFiltersOpen)}
               >
                 <span>More Filters</span>
@@ -158,13 +158,13 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
           {/* Search and Sort in one row */}
           <div className="flex items-center gap-2">
             {/* Search */}
-            <div className="flex items-center border border-border rounded-md px-3 py-2 flex-grow">
+            <div className="flex items-center border border-border rounded-md px-3 flex-grow h-10">
               <Search className="h-5 w-5 text-muted-foreground" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="ml-2 block w-full bg-transparent border-0 focus:outline-none focus:ring-0 sm:text-sm font-styreneA"
+                className="ml-2 block w-full bg-transparent border-0 focus:outline-none focus:ring-0 sm:text-sm font-styreneA h-full py-2"
                 placeholder="Search models or variants..."
               />
               {searchTerm && (
@@ -185,7 +185,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
             <select
               value={filter.sortBy}
               onChange={handleSortChange}
-              className="pl-3 pr-7 py-2 text-sm border-border focus:outline-none focus:ring-accent focus:border-accent rounded-md font-styreneA bg-background text-foreground"
+              className="pl-3 pr-7 py-2 text-sm border-border focus:outline-none focus:ring-accent focus:border-accent rounded-md font-styreneA bg-background text-foreground h-10"
               style={{ minWidth: "130px" }}
             >
               <option value="popular">Most Viewed</option>
@@ -208,7 +208,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
             <div className="fixed inset-0 bg-background/80 z-50 flex flex-col justify-center items-center overflow-hidden">
               <div className="bg-card rounded-lg shadow-xl w-full max-w-xs mx-auto max-h-[80vh] flex flex-col">
                 <div className="flex justify-between items-center border-b border-border px-4 py-3 sticky top-0 bg-card z-10">
-                  <h3 className="text-lg font-medium text-primary font-styreneA">Manufacturers</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-3">Manufacturers</h3>
                   <button
                     type="button"
                     className="text-muted-foreground hover:text-foreground"
@@ -232,7 +232,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                         <div className={`h-4 w-4 rounded border ${
                           filter.manufacturerIds?.includes(mfr.id) 
                           ? 'bg-accent border-accent/80' 
-                          : 'bg-background border-border'
+                          : 'bg-white border-border'
                         } flex items-center justify-center`}>
                           {filter.manufacturerIds?.includes(mfr.id) && (
                             <CheckIcon className="h-3 w-3 text-white" />
@@ -246,7 +246,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                 <div className="border-t border-gray-200 px-4 py-3">
                   <button
                     type="button"
-                    className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-accent hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent font-styreneA"
+                    className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent font-styreneA"
                     onClick={() => setIsManufacturerMenuOpen(false)}
                   >
                     <CheckIcon className="mr-2 h-5 w-5" />
@@ -262,7 +262,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
             <div className="fixed inset-0 bg-background/80 z-50 flex flex-col justify-center items-center overflow-hidden">
               <div className="bg-card rounded-lg shadow-xl w-full max-w-xs mx-auto max-h-[80vh] flex flex-col">
                 <div className="flex justify-between items-center border-b border-border px-4 py-3 sticky top-0 bg-card z-10">
-                  <h3 className="text-lg font-medium text-primary font-styreneA">Filters</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-3">Filters</h3>
                   <button
                     type="button"
                     className="text-muted-foreground hover:text-foreground"
@@ -278,7 +278,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                   <div className="px-4 py-3">
                     {/* Body Style Filters */}
                     <div className="mb-4">
-                      <h4 className="text-sm font-medium text-primary mb-2 font-styreneA">Body Style</h4>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2 font-styreneA">Body Style</h4>
                       <div className="grid grid-cols-2 gap-2">
                         {bodyStyles?.map((style: any) => (
                           <div
@@ -289,7 +289,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                             <div className={`h-4 w-4 rounded border ${
                               filter.bodyStyleIds?.includes(style.id) 
                               ? 'bg-accent border-accent/80' 
-                              : 'bg-background border-border'
+                              : 'bg-white border-border'
                             } flex items-center justify-center`}>
                               {filter.bodyStyleIds?.includes(style.id) && (
                                 <CheckIcon className="h-3 w-3 text-white" />
@@ -462,7 +462,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                 <div className="border-t border-gray-200 px-4 py-3">
                   <button
                     type="button"
-                    className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-accent hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent font-styreneA"
+                    className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-black hover:bg-black/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent font-styreneA"
                     onClick={() => setIsMoreFiltersOpen(false)}
                   >
                     <CheckIcon className="mr-2 h-5 w-5" />
@@ -750,6 +750,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+                  style={{ paddingTop: '0.5rem', paddingBottom: '0.5rem' }}
                   placeholder="Search models or variants..."
                 />
                 {searchTerm && (
@@ -769,9 +770,8 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
               </div>
             </div>
             
-            <div className="text-sm text-gray-500 flex justify-center items-center">
-              <span className="font-medium">{totalResults}</span>&nbsp;results found
-            </div>
+            {/* Empty div to maintain layout structure after removing the results count */}
+            <div className="flex-1"></div>
             
             <div className="w-full">
               <select

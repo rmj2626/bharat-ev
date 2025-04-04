@@ -321,20 +321,22 @@ export function LongDistanceRatingTab({ vehicle }: TabProps) {
         <div className="mb-4">
           <div className="flex items-center mb-1">
             <div className="text-lg font-medium text-gray-900">Rating: {starRating.toFixed(1)} / 5.0</div>
-            <div className="ml-3 text-2xl text-yellow-500" aria-hidden="true">
-              {generateStarRating(starRating)}
-            </div>
+            <div 
+              className="ml-3 text-yellow-500" 
+              aria-hidden="true"
+              dangerouslySetInnerHTML={{ __html: generateStarRating(starRating) }}
+            />
           </div>
           <p className="text-sm text-gray-500">Based on the 2025 EV Long Distance Rating Scale</p>
         </div>
 
         <div className="text-sm text-gray-500 space-y-1">
-          <p>⭐ 0 stars: &lt; 200 km</p>
-          <p>⭐ 1 star: 200 - 324 km</p>
-          <p>⭐⭐ 2 stars: 325 - 449 km</p>
-          <p>⭐⭐⭐ 3 stars: 450 - 574 km</p>
-          <p>⭐⭐⭐⭐ 4 stars: 575 - 699 km</p>
-          <p>⭐⭐⭐⭐⭐ 5 stars: 700+ km</p>
+          <p> 0 stars: &lt; 200 km</p>
+          <p> 1 star: 200 - 324 km</p>
+          <p> 2 stars: 325 - 449 km</p>
+          <p> 3 stars: 450 - 574 km</p>
+          <p> 4 stars: 575 - 699 km</p>
+          <p> 5 stars: 700+ km</p>
         </div>
       </div>
     </div>

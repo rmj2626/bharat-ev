@@ -34,7 +34,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
     <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 h-full">
       <div className="flex flex-col md:flex-row h-full">
         {/* Vehicle Image - Fill entire height in desktop view without margins */}
-        <div className="relative cursor-pointer md:w-1/3 overflow-hidden h-full" style={{ padding: 0 }}>
+        <div className="relative cursor-pointer md:w-1/3 overflow-hidden h-auto" style={{ padding: 0 }}>
           <Link href={`/vehicles/${vehicle.id}`} className="block h-full">
             <div className="h-full w-full bg-muted/30" style={{ 
               aspectRatio: '16/9', 
@@ -42,15 +42,18 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
               margin: 0, 
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              position: 'relative'
             }}>
               <img
                 src={vehicle.image || "https://www.svgrepo.com/show/508699/landscape-placeholder.svg"}
                 alt={`${vehicle.manufacturerName} ${vehicle.modelName} ${vehicle.variantName}`}
                 style={{ 
+                  position: 'absolute',
                   width: '100%', 
                   height: '100%', 
-                  objectFit: 'cover'
+                  objectFit: 'cover',
+                  objectPosition: 'center'
                 }}
               />
             </div>

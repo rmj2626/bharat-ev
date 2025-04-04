@@ -9,6 +9,8 @@ import AdminPage from "@/pages/admin";
 import AdminLogin from "@/pages/admin-login";
 import ComparePage from "@/pages/compare";
 import EstimatorPage from "@/pages/estimator";
+import AboutPage from "@/pages/about";
+import ContactPage from "@/pages/contact";
 import Header from "@/components/header";
 import { ComparisonProvider } from "@/hooks/use-comparison";
 import ComparisonBar from "@/components/comparison-bar";
@@ -74,6 +76,14 @@ function Router() {
         <Route path="/estimator">
           <Header />
           <EstimatorPage />
+        </Route>
+        <Route path="/about">
+          <Header />
+          <AboutPage />
+        </Route>
+        <Route path="/contact">
+          <Header />
+          <ContactPage />
         </Route>
         <Route>
           <Header />

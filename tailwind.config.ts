@@ -5,11 +5,11 @@ export default {
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     fontFamily: {
-      sans: ["Styrene-B", "system-ui", "sans-serif"],
-      serif: ["Tiempos-Text", "Georgia", "serif"],
-      styreneA: ["Styrene-A", "system-ui", "sans-serif"],
-      styreneB: ["Styrene-B", "system-ui", "sans-serif"],
-      tiempos: ["Tiempos-Text", "Georgia", "serif"],
+      sans: ["StyreneB", "system-ui", "sans-serif"],
+      serif: ["Tiempos", "Georgia", "serif"],
+      styreneA: ["StyreneA", "system-ui", "sans-serif"],
+      styreneB: ["StyreneB", "system-ui", "sans-serif"],
+      tiempos: ["Tiempos", "Georgia", "serif"],
     },
     extend: {
       borderRadius: {
