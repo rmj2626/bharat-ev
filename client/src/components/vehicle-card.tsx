@@ -5,6 +5,8 @@ import { VehicleWithDetails } from "@shared/types";
 import { useComparison } from "../hooks/use-comparison";
 import { formatPrice } from "../lib/filterHelpers";
 import { CheckIcon } from "lucide-react";
+import { Button } from "./ui/button";
+import { Card } from "./ui/card";
 
 interface VehicleCardProps {
   vehicle: VehicleWithDetails;
@@ -29,7 +31,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
   };
 
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg hover:shadow-md transition-shadow duration-300">
+    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300">
       <div className="flex flex-col md:flex-row md:h-full">
         {/* Vehicle Image - Fill entire height in desktop view without margins */}
         <div className="relative cursor-pointer md:w-1/4 overflow-hidden" style={{ padding: 0 }}>
@@ -59,8 +61,8 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
             <div
               className={`h-6 w-6 rounded-sm border ${
                 selected 
-                  ? 'bg-blue-500 border-blue-600' 
-                  : 'bg-white border-gray-300 hover:border-blue-400'
+                  ? 'bg-accent border-accent/80' 
+                  : 'bg-background border-border hover:border-accent/60'
               } flex items-center justify-center cursor-pointer transition-colors duration-200`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -80,20 +82,20 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
           <div className="flex flex-col md:flex-row md:justify-between">
             <div>
               <Link href={`/vehicles/${vehicle.id}`}>
-                <h2 className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
+                <h2 className="text-xl font-medium text-primary hover:text-accent cursor-pointer font-styreneB">
                   {vehicle.manufacturerName} {vehicle.modelName} {vehicle.variantName}
                 </h2>
               </Link>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-muted-foreground mb-4 font-tiempos">
                 {vehicle.bodyStyleName} • {vehicle.manufacturingStartYear}
                 {vehicle.manufacturingEndYear ? `-${vehicle.manufacturingEndYear}` : ""}
               </p>
             </div>
             <div className="mt-2 md:mt-0 inline-flex md:flex-col items-center md:items-end">
-              <span className="text-xl font-semibold text-gray-900">
+              <span className="text-xl font-medium text-primary font-styreneB">
                 {formatPrice(vehicle.price)}
               </span>
-              <span className="ml-2 md:ml-0 text-sm text-gray-500">Ex-showroom</span>
+              <span className="ml-2 md:ml-0 text-sm text-muted-foreground font-tiempos">Ex-showroom</span>
             </div>
           </div>
 
@@ -146,15 +148,14 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
           </div>
 
           <div className="mt-4 flex w-full">
-            <Link 
-              href={`/vehicles/${vehicle.id}`}
-              className="w-full md:w-auto inline-flex justify-center md:justify-start items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            >
-              View Details
+            <Link href={`/vehicles/${vehicle.id}`} className="w-full md:w-auto">
+              <Button variant="accent" className="w-full md:w-auto">
+                View Details
+              </Button>
             </Link>
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

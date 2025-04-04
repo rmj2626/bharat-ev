@@ -1,3 +1,6 @@
+/* stylelint-disable */
+@import "./styles/theme.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,4 +13,21 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+
+  h1, h2, h3 {
+    @apply font-styreneB font-medium;
+  }
+
+  h4, h5, h6 {
+    @apply font-styreneA font-medium;
+  }
+
+  p, li, blockquote {
+    @apply font-tiempos font-normal;
+  }
+
+  button, a.btn {
+    @apply font-styreneB font-medium;
+  }
 }
+/* stylelint-enable */

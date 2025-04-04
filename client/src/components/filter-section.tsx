@@ -125,7 +125,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
   }, [debouncedSearchTerm, filter.searchTerm]); // Removed onFilterChange from dependency array to prevent infinite loop
 
   return (
-    <div className="bg-white rounded-lg shadow mb-8">
+    <div className="bg-card rounded-lg shadow mb-8">
       {/* Mobile Filter Display */}
       {isMobile && (
         <div className="p-4 space-y-4">
@@ -133,7 +133,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
             <div className="w-1/2 pr-2">
               <button
                 type="button"
-                className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="w-full flex justify-between items-center px-4 py-2 border border-border rounded-md shadow-sm bg-background text-sm font-medium text-foreground font-styreneA hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
                 onClick={() => setIsManufacturerMenuOpen(!isManufacturerMenuOpen)}
               >
                 <span>Manufacturer</span>
@@ -143,7 +143,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
             <div className="w-1/2 pl-2">
               <button
                 type="button"
-                className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="w-full flex justify-between items-center px-4 py-2 border border-border rounded-md shadow-sm bg-background text-sm font-medium text-foreground font-styreneA hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
                 onClick={() => setIsMoreFiltersOpen(!isMoreFiltersOpen)}
               >
                 <span>More Filters</span>
@@ -158,13 +158,13 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
           {/* Search and Sort in one row */}
           <div className="flex items-center gap-2">
             {/* Search */}
-            <div className="flex items-center border border-gray-300 rounded-md px-3 py-2 flex-grow">
-              <Search className="h-5 w-5 text-gray-400" />
+            <div className="flex items-center border border-border rounded-md px-3 py-2 flex-grow">
+              <Search className="h-5 w-5 text-muted-foreground" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="ml-2 block w-full bg-transparent border-0 focus:outline-none focus:ring-0 sm:text-sm"
+                className="ml-2 block w-full bg-transparent border-0 focus:outline-none focus:ring-0 sm:text-sm font-styreneA"
                 placeholder="Search models or variants..."
               />
               {searchTerm && (
@@ -174,7 +174,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                     setSearchTerm("");
                     onFilterChange({ searchTerm: undefined, page: 1 });
                   }}
-                  className="text-gray-400 hover:text-gray-500"
+                  className="text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -185,7 +185,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
             <select
               value={filter.sortBy}
               onChange={handleSortChange}
-              className="pl-3 pr-7 py-2 text-sm border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 rounded-md"
+              className="pl-3 pr-7 py-2 text-sm border-border focus:outline-none focus:ring-accent focus:border-accent rounded-md font-styreneA bg-background text-foreground"
               style={{ minWidth: "130px" }}
             >
               <option value="popular">Most Viewed</option>
@@ -205,13 +205,13 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
           
           {/* Manufacturer Filter Popup (Mobile) */}
           {isManufacturerMenuOpen && (
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 z-50 flex flex-col justify-center items-center overflow-hidden">
-              <div className="bg-white rounded-lg shadow-xl w-full max-w-xs mx-auto max-h-[80vh] flex flex-col">
-                <div className="flex justify-between items-center border-b border-gray-200 px-4 py-3 sticky top-0 bg-white z-10">
-                  <h3 className="text-lg font-medium text-gray-900">Manufacturers</h3>
+            <div className="fixed inset-0 bg-background/80 z-50 flex flex-col justify-center items-center overflow-hidden">
+              <div className="bg-card rounded-lg shadow-xl w-full max-w-xs mx-auto max-h-[80vh] flex flex-col">
+                <div className="flex justify-between items-center border-b border-border px-4 py-3 sticky top-0 bg-card z-10">
+                  <h3 className="text-lg font-medium text-primary font-styreneA">Manufacturers</h3>
                   <button
                     type="button"
-                    className="text-gray-400 hover:text-gray-500"
+                    className="text-muted-foreground hover:text-foreground"
                     onClick={() => setIsManufacturerMenuOpen(false)}
                   >
                     <span className="sr-only">Close</span>
@@ -226,19 +226,19 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                     {manufacturers?.sort((a: any, b: any) => a.name.localeCompare(b.name)).map((mfr: any) => (
                       <div
                         key={mfr.id}
-                        className="flex items-center px-2 py-2 hover:bg-gray-100 cursor-pointer rounded"
+                        className="flex items-center px-2 py-2 hover:bg-muted/50 cursor-pointer rounded"
                         onClick={(e) => handleManufacturerSelect(e, mfr.id)}
                       >
                         <div className={`h-4 w-4 rounded border ${
                           filter.manufacturerIds?.includes(mfr.id) 
-                          ? 'bg-blue-500 border-blue-600' 
-                          : 'bg-white border-gray-300'
+                          ? 'bg-accent border-accent/80' 
+                          : 'bg-background border-border'
                         } flex items-center justify-center`}>
                           {filter.manufacturerIds?.includes(mfr.id) && (
                             <CheckIcon className="h-3 w-3 text-white" />
                           )}
                         </div>
-                        <label className="ml-2 text-sm text-gray-700 truncate">{mfr.name}</label>
+                        <label className="ml-2 text-sm text-foreground truncate font-styreneA">{mfr.name}</label>
                       </div>
                     ))}
                   </div>
@@ -246,7 +246,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                 <div className="border-t border-gray-200 px-4 py-3">
                   <button
                     type="button"
-                    className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-accent hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent font-styreneA"
                     onClick={() => setIsManufacturerMenuOpen(false)}
                   >
                     <CheckIcon className="mr-2 h-5 w-5" />
@@ -259,13 +259,13 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
           
           {/* More Filters (Mobile) */}
           {isMoreFiltersOpen && (
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 z-50 flex flex-col justify-center items-center overflow-hidden">
-              <div className="bg-white rounded-lg shadow-xl w-full max-w-xs mx-auto max-h-[80vh] flex flex-col">
-                <div className="flex justify-between items-center border-b border-gray-200 px-4 py-3 sticky top-0 bg-white z-10">
-                  <h3 className="text-lg font-medium text-gray-900">Filters</h3>
+            <div className="fixed inset-0 bg-background/80 z-50 flex flex-col justify-center items-center overflow-hidden">
+              <div className="bg-card rounded-lg shadow-xl w-full max-w-xs mx-auto max-h-[80vh] flex flex-col">
+                <div className="flex justify-between items-center border-b border-border px-4 py-3 sticky top-0 bg-card z-10">
+                  <h3 className="text-lg font-medium text-primary font-styreneA">Filters</h3>
                   <button
                     type="button"
-                    className="text-gray-400 hover:text-gray-500"
+                    className="text-muted-foreground hover:text-foreground"
                     onClick={() => setIsMoreFiltersOpen(false)}
                   >
                     <span className="sr-only">Close</span>
@@ -278,7 +278,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                   <div className="px-4 py-3">
                     {/* Body Style Filters */}
                     <div className="mb-4">
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Body Style</h4>
+                      <h4 className="text-sm font-medium text-primary mb-2 font-styreneA">Body Style</h4>
                       <div className="grid grid-cols-2 gap-2">
                         {bodyStyles?.map((style: any) => (
                           <div
@@ -288,14 +288,14 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                           >
                             <div className={`h-4 w-4 rounded border ${
                               filter.bodyStyleIds?.includes(style.id) 
-                              ? 'bg-blue-500 border-blue-600' 
-                              : 'bg-white border-gray-300'
+                              ? 'bg-accent border-accent/80' 
+                              : 'bg-background border-border'
                             } flex items-center justify-center`}>
                               {filter.bodyStyleIds?.includes(style.id) && (
                                 <CheckIcon className="h-3 w-3 text-white" />
                               )}
                             </div>
-                            <label className="ml-2 text-sm text-gray-700">{style.name}</label>
+                            <label className="ml-2 text-sm text-foreground font-styreneA">{style.name}</label>
                           </div>
                         ))}
                       </div>
@@ -347,7 +347,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                       
                       {/* Drive Type */}
                       <div className="mb-4">
-                        <h5 className="text-xs font-medium text-gray-700 mb-2">Drive Type</h5>
+                        <h5 className="text-xs font-medium text-muted-foreground mb-2 font-styreneA">Drive Type</h5>
                         <div className="flex flex-wrap gap-2">
                           {driveTypes?.map((type: any) => (
                             <label key={type.id} className="inline-flex items-center">
@@ -365,7 +365,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                       
                       {/* Battery Type */}
                       <div className="mb-4">
-                        <h5 className="text-xs font-medium text-gray-700 mb-2">Battery Chemistry</h5>
+                        <h5 className="text-xs font-medium text-muted-foreground mb-2 font-styreneA">Battery Chemistry</h5>
                         <div className="flex flex-wrap gap-2">
                           {batteryTypes?.map((type: any) => (
                             <label key={type.id} className="inline-flex items-center">
@@ -462,7 +462,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                 <div className="border-t border-gray-200 px-4 py-3">
                   <button
                     type="button"
-                    className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                    className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-accent hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent font-styreneA"
                     onClick={() => setIsMoreFiltersOpen(false)}
                   >
                     <CheckIcon className="mr-2 h-5 w-5" />
@@ -760,7 +760,7 @@ export default function FilterSection({ filter, totalResults, onFilterChange }: 
                         setSearchTerm("");
                         onFilterChange({ searchTerm: undefined, page: 1 });
                       }}
-                      className="text-gray-400 hover:text-gray-500"
+                      className="text-muted-foreground hover:text-foreground"
                     >
                       <X className="h-5 w-5" />
                     </button>

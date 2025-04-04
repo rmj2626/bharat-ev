@@ -65,15 +65,15 @@ export default function Home() {
   return (
     <main className="w-full px-4 md:w-3/5 mx-auto py-8" style={{ maxWidth: '1280px' }}>
       {/* Page Title */}
-      <div className="border-b border-gray-200 pb-5 mb-6">
-        <h1 className="text-2xl font-bold leading-tight text-gray-900">All Electric Vehicles in India</h1>
-        <p className="mt-2 text-sm text-gray-500">
+      <div className="border-b border-border pb-5 mb-6">
+        <h1 className="text-3xl font-medium leading-tight text-primary font-styreneB">All Electric Vehicles in India</h1>
+        <p className="mt-2 text-base text-muted-foreground font-tiempos">
           Browse, filter, and compare detailed specifications of all EVs available in the Indian market
         </p>
       </div>
 
       {/* Container for both filter and results */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-card rounded-lg shadow-md overflow-hidden">
         {/* Filter Section */}
         <div className="border-b border-gray-200">
           <FilterSection
@@ -84,21 +84,21 @@ export default function Home() {
         </div>
 
         {/* Results count - visual connection between filter and results */}
-        <div className="py-3 px-6 bg-gray-100 border-b border-gray-200 flex justify-center items-center">
-          <div className="text-sm font-medium text-gray-700 text-center">
+        <div className="py-3 px-6 bg-muted border-b border-border flex justify-center items-center">
+          <div className="text-sm font-medium text-foreground text-center font-styreneA">
             <span>{vehiclesData?.pagination?.total || 0}</span> results found
           </div>
         </div>
 
         {/* Results Section - Slightly inset with subtle shadow */}
-        <div className="bg-gray-50 p-4">
+        <div className="bg-background p-4">
           {/* Loading State */}
           {isLoading && (
             <div className="my-12 flex justify-center">
               <div className="animate-pulse flex flex-col items-center">
-                <div className="rounded-full bg-gray-200 h-12 w-12 mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-24 mb-2.5"></div>
-                <div className="h-3 bg-gray-200 rounded w-36"></div>
+                <div className="rounded-full bg-muted h-12 w-12 mb-4"></div>
+                <div className="h-4 bg-muted rounded w-24 mb-2.5"></div>
+                <div className="h-3 bg-muted rounded w-36"></div>
               </div>
             </div>
           )}
@@ -106,9 +106,9 @@ export default function Home() {
           {/* Error State */}
           {isError && (
             <div className="my-8 text-center">
-              <div className="bg-red-50 p-6 rounded-lg shadow-inner">
-                <h3 className="text-lg font-medium text-red-800">Failed to load vehicles</h3>
-                <p className="mt-2 text-sm text-red-700">
+              <div className="bg-destructive/10 p-6 rounded-lg shadow-inner">
+                <h3 className="text-lg font-medium text-destructive font-styreneA">Failed to load vehicles</h3>
+                <p className="mt-2 text-sm text-destructive/80 font-tiempos">
                   There was an error loading the vehicle listings. Please try again later.
                 </p>
               </div>
@@ -118,9 +118,9 @@ export default function Home() {
           {/* Empty State */}
           {!isLoading && !isError && vehiclesData?.data?.length === 0 && (
             <div className="my-8 text-center">
-              <div className="bg-white p-6 rounded-lg shadow-inner">
-                <h3 className="text-lg font-medium text-gray-900">No vehicles found</h3>
-                <p className="mt-2 text-sm text-gray-500">
+              <div className="bg-card p-6 rounded-lg shadow-inner">
+                <h3 className="text-lg font-medium text-primary font-styreneA">No vehicles found</h3>
+                <p className="mt-2 text-sm text-muted-foreground font-tiempos">
                   No electric vehicles match your current filter criteria. Try adjusting your filters.
                 </p>
               </div>

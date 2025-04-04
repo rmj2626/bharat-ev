@@ -4,6 +4,13 @@ export default {
   darkMode: ["class"],
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
+    fontFamily: {
+      sans: ["Styrene-B", "system-ui", "sans-serif"],
+      serif: ["Tiempos-Text", "Georgia", "serif"],
+      styreneA: ["Styrene-A", "system-ui", "sans-serif"],
+      styreneB: ["Styrene-B", "system-ui", "sans-serif"],
+      tiempos: ["Tiempos-Text", "Georgia", "serif"],
+    },
     extend: {
       borderRadius: {
         lg: "var(--radius)",
