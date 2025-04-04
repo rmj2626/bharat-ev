@@ -6,8 +6,13 @@ import fs from 'fs';
 
 // Create database connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  host: process.env.PGHOST || 'localhost',
+  port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5432,
+  user: process.env.PGUSER || 'postgres',
+  password: process.env.PGPASSWORD || 'postgres',
+  database: process.env.PGDATABASE || 'bharat_ev',
+  // Only use SSL in production environment
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 // Log with timestamp

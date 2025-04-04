@@ -27,8 +27,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get appropriate storage implementation based on database connection status
   const storage = await getStorage();
   
-  // Temporarily skip data seeding due to database initialization
-  // await seedDefaultData();
+  // Seed default data for the application
+  await seedDefaultData();
   
   // Authentication routes
   app.post('/api/auth/login', async (req, res) => {
