@@ -85,8 +85,8 @@ app.use((req, res, next) => {
   const port = 5000;
   server.listen({
     port,
-    host: "0.0.0.0",
-    reusePort: true,
+    host: "127.0.0.1",  // Use localhost instead of 0.0.0.0
+    // reusePort: true,  // This option might not be supported on Windows
   }, () => {
     log(`serving on port ${port}`);
   });

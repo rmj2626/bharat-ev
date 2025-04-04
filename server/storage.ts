@@ -27,12 +27,13 @@ import {
   type Vehicle,
   type InsertVehicle
 } from "@shared/schema";
-import { db } from "./db";
+import { getDb } from "./db";
 import { eq, and, or, between, like, gte, lte, inArray, sql, desc, asc } from "drizzle-orm";
 import { PaginatedResult, VehicleFilter, VehicleWithDetails } from "@shared/types";
 
 // Function to ensure db is not null when used
-function ensureDb() {
+async function ensureDb() {
+  const db = await getDb();
   if (!db) {
     throw new Error("Database is not initialized");
   }
@@ -98,19 +99,19 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: number): Promise<User | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [user] = await safeDb.select().from(users).where(eq(users.id, id));
     return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [user] = await safeDb.select().from(users).where(eq(users.username, username));
     return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [user] = await safeDb
       .insert(users)
       .values(insertUser)
@@ -120,18 +121,18 @@ export class DatabaseStorage implements IStorage {
 
   // Manufacturer operations
   async getManufacturers(): Promise<Manufacturer[]> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     return safeDb.select().from(manufacturers);
   }
 
   async getManufacturer(id: number): Promise<Manufacturer | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [manufacturer] = await safeDb.select().from(manufacturers).where(eq(manufacturers.id, id));
     return manufacturer;
   }
 
   async createManufacturer(insertManufacturer: InsertManufacturer): Promise<Manufacturer> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [manufacturer] = await safeDb
       .insert(manufacturers)
       .values(insertManufacturer)
@@ -140,24 +141,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteManufacturer(id: number): Promise<void> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     await safeDb.delete(manufacturers).where(eq(manufacturers.id, id));
   }
 
   // Body style operations
   async getBodyStyles(): Promise<BodyStyle[]> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     return safeDb.select().from(bodyStyles);
   }
 
   async getBodyStyle(id: number): Promise<BodyStyle | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [bodyStyle] = await safeDb.select().from(bodyStyles).where(eq(bodyStyles.id, id));
     return bodyStyle;
   }
 
   async createBodyStyle(insertBodyStyle: InsertBodyStyle): Promise<BodyStyle> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [bodyStyle] = await safeDb
       .insert(bodyStyles)
       .values(insertBodyStyle)
@@ -167,18 +168,18 @@ export class DatabaseStorage implements IStorage {
 
   // Drive type operations
   async getDriveTypes(): Promise<DriveType[]> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     return safeDb.select().from(driveTypes);
   }
 
   async getDriveType(id: number): Promise<DriveType | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [driveType] = await safeDb.select().from(driveTypes).where(eq(driveTypes.id, id));
     return driveType;
   }
 
   async createDriveType(insertDriveType: InsertDriveType): Promise<DriveType> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [driveType] = await safeDb
       .insert(driveTypes)
       .values(insertDriveType)
@@ -188,18 +189,18 @@ export class DatabaseStorage implements IStorage {
 
   // Battery type operations
   async getBatteryTypes(): Promise<BatteryType[]> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     return safeDb.select().from(batteryTypes);
   }
 
   async getBatteryType(id: number): Promise<BatteryType | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [batteryType] = await safeDb.select().from(batteryTypes).where(eq(batteryTypes.id, id));
     return batteryType;
   }
 
   async createBatteryType(insertBatteryType: InsertBatteryType): Promise<BatteryType> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [batteryType] = await safeDb
       .insert(batteryTypes)
       .values(insertBatteryType)
@@ -209,18 +210,18 @@ export class DatabaseStorage implements IStorage {
 
   // Charging port location operations
   async getChargingPortLocations(): Promise<ChargingPortLocation[]> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     return safeDb.select().from(chargingPortLocations);
   }
 
   async getChargingPortLocation(id: number): Promise<ChargingPortLocation | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [location] = await safeDb.select().from(chargingPortLocations).where(eq(chargingPortLocations.id, id));
     return location;
   }
 
   async createChargingPortLocation(insertLocation: InsertChargingPortLocation): Promise<ChargingPortLocation> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [location] = await safeDb
       .insert(chargingPortLocations)
       .values(insertLocation)
@@ -230,18 +231,18 @@ export class DatabaseStorage implements IStorage {
 
   // Range rating system operations
   async getRangeRatingSystems(): Promise<RangeRatingSystem[]> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     return safeDb.select().from(rangeRatingSystems);
   }
 
   async getRangeRatingSystem(id: number): Promise<RangeRatingSystem | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [system] = await safeDb.select().from(rangeRatingSystems).where(eq(rangeRatingSystems.id, id));
     return system;
   }
 
   async createRangeRatingSystem(insertSystem: InsertRangeRatingSystem): Promise<RangeRatingSystem> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [system] = await safeDb
       .insert(rangeRatingSystems)
       .values(insertSystem)
@@ -251,18 +252,18 @@ export class DatabaseStorage implements IStorage {
 
   // Car model operations
   async getCarModels(): Promise<CarModel[]> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     return safeDb.select().from(carModels);
   }
 
   async getCarModel(id: number): Promise<CarModel | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [model] = await safeDb.select().from(carModels).where(eq(carModels.id, id));
     return model;
   }
 
   async createCarModel(insertCarModel: InsertCarModel): Promise<CarModel> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [model] = await safeDb
       .insert(carModels)
       .values(insertCarModel)
@@ -271,7 +272,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async incrementViewCount(id: number): Promise<void> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     await safeDb
       .update(vehicles)
       .set({ viewCount: sql`${vehicles.viewCount} + 1` })
@@ -279,24 +280,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteCarModel(id: number): Promise<void> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     await safeDb.delete(carModels).where(eq(carModels.id, id));
   }
 
   // Vehicle operations
   async getVehicles(): Promise<Vehicle[]> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     return safeDb.select().from(vehicles);
   }
 
   async getVehicle(id: number): Promise<Vehicle | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [vehicle] = await safeDb.select().from(vehicles).where(eq(vehicles.id, id));
     return vehicle;
   }
 
   async createVehicle(insertVehicle: InsertVehicle): Promise<Vehicle> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const [vehicle] = await safeDb
       .insert(vehicles)
       .values(insertVehicle)
@@ -305,13 +306,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteVehicle(id: number): Promise<void> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     await safeDb.delete(vehicles).where(eq(vehicles.id, id));
   }
 
   // Complex queries
   async getVehicleWithDetails(id: number): Promise<VehicleWithDetails | undefined> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     const result = await safeDb.execute<Record<string, unknown>>(sql`
       SELECT 
         v.id,
@@ -387,7 +388,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async filterVehicles(filter: VehicleFilter): Promise<PaginatedResult<VehicleWithDetails>> {
-    const safeDb = ensureDb();
+    const safeDb = await ensureDb();
     
     // Start building the query
     let query = sql`

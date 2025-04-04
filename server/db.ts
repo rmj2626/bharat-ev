@@ -18,19 +18,25 @@ async function attemptPostgresConnection() {
     }
 
     // Create pool with improved configuration
-    const pool = new Pool({
+    const poolConfig: any = {
       host: process.env.PGHOST,
       port: process.env.PGPORT ? parseInt(process.env.PGPORT) : 5432,
       user: process.env.PGUSER,
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
-      ssl: { rejectUnauthorized: false },
       // Connection timeout (ms)
       connectionTimeoutMillis: 5000,
       // Short idle timeout for quick testing
       idleTimeoutMillis: 10000,
       max: 5
-    });
+    };
+    
+    // Only use SSL in production environment
+    if (process.env.NODE_ENV === 'production') {
+      poolConfig.ssl = { rejectUnauthorized: false };
+    }
+    
+    const pool = new Pool(poolConfig);
 
     // Add event listeners for connection issues
     pool.on('error', (err) => {
@@ -39,7 +45,7 @@ async function attemptPostgresConnection() {
     });
 
     // Test the connection with a timeout
-    const connectionResult = await Promise.race([
+    const connectionResult: any = await Promise.race([
       pool.query('SELECT NOW()'),
       new Promise((_, reject) => setTimeout(() => reject(new Error('Connection timeout')), 5000))
     ]);
@@ -62,19 +68,38 @@ async function attemptPostgresConnection() {
   return { success: false };
 }
 
-// Attempt to connect to PostgreSQL
-const connectionAttempt = await attemptPostgresConnection();
+// Initialize variables that will be set during connection
+let connectionAttempt: any = null;
+let pool: any = null;
+let db: any = null;
 
-// Create pool and db only if connection was successful
-const pool = connectionAttempt.success ? connectionAttempt.pool : null;
+// Initialize the database connection
+function initializeDatabase() {
+  return attemptPostgresConnection().then((result) => {
+    connectionAttempt = result;
+    // Create pool and db only if connection was successful
+    pool = connectionAttempt && connectionAttempt.success ? connectionAttempt.pool : null;
+    // For type safety, we'll create a db instance even if it might not be used
+    db = pool ? drizzle(pool, { schema }) : null;
+    return db;
+  });
+}
 
-// For type safety, we'll create a db instance even if it might not be used
-export const db = pool ? drizzle(pool, { schema }) : null;
+// Export the database instance
+export const getDb = async () => {
+  if (!db) {
+    await initializeDatabase();
+  }
+  return db;
+};
 
 // This function returns the database storage implementation
 export async function getStorage() {
+  // Ensure we have a database connection
+  const database = await getDb();
+  
   // Verify we have a database connection
-  if (!dbConnected || !db) {
+  if (!dbConnected || !database) {
     console.error('ERROR: No database connection available');
     process.exit(1);
   }
