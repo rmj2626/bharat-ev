@@ -52,14 +52,14 @@ async function importReferenceData() {
   try {
     log('Importing reference data...');
     
-    // Import body styles
+    // Import body styles - ensuring they match what's in the CSV file
     await pool.query(`
       INSERT INTO body_styles (id, name) VALUES 
       (1, 'Coupe'), 
       (2, 'SUV'), 
       (3, 'Sedan'), 
       (4, 'Hatchback'), 
-      (5, 'Wagon')
+      (5, 'MPV')
     `);
     
     // Import drive types

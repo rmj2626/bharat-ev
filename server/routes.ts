@@ -240,7 +240,8 @@ async function seedDefaultData() {
   // Seed body styles if empty
   const bodyStyles = await storage.getBodyStyles();
   if (bodyStyles.length === 0) {
-    const defaultBodyStyles = ["Sedan", "SUV", "MPV", "Hatchback", "Coupe", "Convertible"];
+    // Only use body styles that match what's in the CSV file
+    const defaultBodyStyles = ["SUV", "Sedan", "Hatchback", "MPV", "Coupe"];
     for (const name of defaultBodyStyles) {
       await storage.createBodyStyle({ name });
     }
@@ -394,7 +395,7 @@ async function seedDefaultData() {
             fastChargingTime: 57,
             weight: 1610,
             v2lSupport: false,
-            price: 2399000
+            price: 23.99 // Prices in lakhs (not rupees)
           });
         } 
         // Add variants for the BYD Atto 3 model
@@ -421,7 +422,7 @@ async function seedDefaultData() {
             weight: 1750,
             v2lSupport: true,
             v2lOutputPower: 3000,
-            price: 3399000
+            price: 33.99 // Prices in lakhs (not rupees)
           });
         } 
         // Add variants for the MG ZS EV model
@@ -447,7 +448,7 @@ async function seedDefaultData() {
             fastChargingTime: 60,
             weight: 1620,
             v2lSupport: false,
-            price: 2249000
+            price: 22.49 // Prices in lakhs (not rupees)
           });
         }
       }
