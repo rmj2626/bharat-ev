@@ -33,34 +33,34 @@ export function BatteryTab({ vehicle }: TabProps) {
     <div className="mt-8">
       <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Battery Type</dt>
-          <dd className="mt-1 text-sm text-gray-900">{vehicle.batteryTypeName || "N/A"}</dd>
+          <dt className="text-sm font-bold text-gray-900">Battery Type</dt>
+          <dd className="mt-1 text-sm text-gray-500">{vehicle.batteryTypeName || "N/A"}</dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Total Capacity</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Total Capacity</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.batteryCapacity ? `${vehicle.batteryCapacity} kWh` : "N/A"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Usable Capacity</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Usable Capacity</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.usableBatteryCapacity ? `${vehicle.usableBatteryCapacity} kWh` : "N/A"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Warranty</dt>
-          <dd className="mt-1 text-sm text-gray-900">{getBatteryWarranty()}</dd>
+          <dt className="text-sm font-bold text-gray-900">Warranty</dt>
+          <dd className="mt-1 text-sm text-gray-500">{getBatteryWarranty()}</dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Official Range</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Official Range</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.officialRange ? `${vehicle.officialRange} km (${vehicle.rangeRatingSystem})` : "N/A"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Real-World Range</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Real-World Range</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.realWorldRange ? `${vehicle.realWorldRange} km` : "N/A"}
           </dd>
         </div>
@@ -74,36 +74,36 @@ export function PerformanceTab({ vehicle }: TabProps) {
     <div className="mt-8">
       <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Power</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Power</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.horsepower ? `${vehicle.horsepower} BHP (${Math.round(vehicle.horsepower * 0.7457)} kW)` : "N/A"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Torque</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Torque</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.torque ? `${vehicle.torque} Nm` : "N/A"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">0-100 km/h</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">0-100 km/h</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.acceleration ? `${vehicle.acceleration} seconds` : "N/A"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Top Speed</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Top Speed</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.topSpeed ? `${vehicle.topSpeed} km/h` : "N/A"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Drive Type</dt>
-          <dd className="mt-1 text-sm text-gray-900">{vehicle.driveTypeName || "N/A"}</dd>
+          <dt className="text-sm font-bold text-gray-900">Drive Type</dt>
+          <dd className="mt-1 text-sm text-gray-500">{vehicle.driveTypeName || "N/A"}</dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Weight</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Weight</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.weight ? `${vehicle.weight.toLocaleString()} kg` : "N/A"}
           </dd>
         </div>
@@ -171,36 +171,36 @@ export function ChargingTab({ vehicle }: TabProps) {
     <div className="mt-8">
       <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Fast Charging Capacity</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Fast Charging Capacity</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.fastChargingCapacity && vehicle.fastChargingCapacity > 0 
               ? `${vehicle.fastChargingCapacity} kW` 
               : "Not Supported"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Fast Charging Time (10-80%)</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Fast Charging Time (10-80%)</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {hasFastCharging && vehicle.fastChargingTime 
               ? `${vehicle.fastChargingTime} minutes ${get1080RangeAdded()}` 
               : "Not Supported"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Average DC Fast Charging Speed (10-80%)</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Average DC Fast Charging Speed (10-80%)</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {getAvgDCFastChargingSpeed()}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Range Added per Minute (DC Fast Charging)</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Range Added per Minute (DC Fast Charging)</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {getRangePerMinute()}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Estimated Charging Time (0-100%, AC 7.4kW)</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Estimated Charging Time (0-100%, AC 7.4kW)</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {getFormattedChargingTime()}
           </dd>
         </div>
@@ -348,32 +348,32 @@ export function FeaturesTab({ vehicle }: TabProps) {
     <div className="mt-8">
       <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Vehicle-to-Load (V2L) Support</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Vehicle-to-Load (V2L) Support</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.v2lSupport ? "Yes" : "No"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">V2L Output Power</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">V2L Output Power</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.v2lSupport && vehicle.v2lOutputPower
               ? `${vehicle.v2lOutputPower} Watts`
               : "N/A"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Boot Space</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Boot Space</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.bootSpace ? `${vehicle.bootSpace} liters` : "N/A"}
           </dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Battery Type</dt>
-          <dd className="mt-1 text-sm text-gray-900">{vehicle.batteryTypeName || "N/A"}</dd>
+          <dt className="text-sm font-bold text-gray-900">Battery Type</dt>
+          <dd className="mt-1 text-sm text-gray-500">{vehicle.batteryTypeName || "N/A"}</dd>
         </div>
         <div className="sm:col-span-1">
-          <dt className="text-sm font-medium text-gray-500">Battery Warranty</dt>
-          <dd className="mt-1 text-sm text-gray-900">
+          <dt className="text-sm font-bold text-gray-900">Battery Warranty</dt>
+          <dd className="mt-1 text-sm text-gray-500">
             {vehicle.batteryWarrantyYears && vehicle.batteryWarrantyKm
               ? `${vehicle.batteryWarrantyYears} years / ${vehicle.batteryWarrantyKm.toLocaleString()} km`
               : vehicle.batteryWarrantyYears

@@ -146,7 +146,7 @@ export default function VehicleDetails() {
           <div className="sm:w-1/2 p-4 sm:p-6 space-y-6">
             <div>
               <div className="flex justify-between items-center">
-                <h4 className="text-sm font-medium text-gray-500">Key Specifications</h4>
+                <h4 className="text-sm font-bold text-gray-900">Key Specifications</h4>
                 <button
                   onClick={() => vehicle && toggleVehicle(vehicle)}
                   className={`inline-flex items-center px-3 py-1.5 border rounded-md text-sm font-medium 
@@ -175,8 +175,8 @@ export default function VehicleDetails() {
                     <Battery className="h-6 w-6" />
                   </div>
                   <div className="ml-4">
-                    <dt className="text-sm font-medium text-gray-500">Battery</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-bold text-gray-900">Battery</dt>
+                    <dd className="mt-1 text-sm text-gray-500">
                       {vehicle.batteryCapacity ? `${vehicle.batteryCapacity} kWh` : "N/A"}
                     </dd>
                   </div>
@@ -187,8 +187,8 @@ export default function VehicleDetails() {
                     <MapPin className="h-6 w-6" />
                   </div>
                   <div className="ml-4">
-                    <dt className="text-sm font-medium text-gray-500">Real Range</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-bold text-gray-900">Real Range</dt>
+                    <dd className="mt-1 text-sm text-gray-500">
                       {vehicle.realWorldRange ? `${vehicle.realWorldRange} km` : "N/A"}
                     </dd>
                   </div>
@@ -199,8 +199,8 @@ export default function VehicleDetails() {
                     <Zap className="h-6 w-6" />
                   </div>
                   <div className="ml-4">
-                    <dt className="text-sm font-medium text-gray-500">Fast Charging</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{getChargeTime()}</dd>
+                    <dt className="text-sm font-bold text-gray-900">Fast Charging</dt>
+                    <dd className="mt-1 text-sm text-gray-500">{getChargeTime()}</dd>
                   </div>
                 </div>
 
@@ -209,8 +209,8 @@ export default function VehicleDetails() {
                     <Clock className="h-6 w-6" />
                   </div>
                   <div className="ml-4">
-                    <dt className="text-sm font-medium text-gray-500">0-100 km/h</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-bold text-gray-900">0-100 km/h</dt>
+                    <dd className="mt-1 text-sm text-gray-500">
                       {vehicle.acceleration ? `${vehicle.acceleration} sec` : "N/A"}
                     </dd>
                   </div>
