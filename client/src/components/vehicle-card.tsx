@@ -7,6 +7,7 @@ import { formatPrice } from "../lib/filterHelpers";
 import { CheckIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
+import styles from "./desktop-styles.module.css";
 
 interface VehicleCardProps {
   vehicle: VehicleWithDetails;
@@ -30,11 +31,21 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
     return "N/A";
   };
 
+  // Only apply desktop styles on larger screens
+  const isDesktop = window.matchMedia("(min-width: 1280px)").matches;
+  const cardClassName = isDesktop 
+    ? `overflow-hidden hover:shadow-md transition-shadow duration-300 h-full ${styles.vehicleCard}` 
+    : "overflow-hidden hover:shadow-md transition-shadow duration-300 h-full";
+    
+  const specGridClassName = isDesktop
+    ? `mt-2 grid grid-cols-5 gap-1 text-xs ${styles.specGrid}`
+    : "mt-2 grid grid-cols-5 gap-1 text-xs";
+
   return (
-    <Card className="overflow-hidden hover:shadow-md transition-shadow duration-300 h-full">
+    <Card className={cardClassName}>
       <div className="flex flex-col md:flex-row h-full">
-        {/* Vehicle Image - Fill entire height in desktop view without margins */}
-        <div className="relative cursor-pointer md:w-1/3 overflow-hidden h-auto" style={{ padding: 0 }}>
+        {/* Vehicle Image - Maintain original aspect ratio */}
+        <div className="relative cursor-pointer md:w-1/3 overflow-hidden h-auto">
           <Link href={`/vehicles/${vehicle.id}`} className="block h-full">
             <div className="h-full w-full bg-muted/30" style={{ 
               aspectRatio: '16/9', 
@@ -101,7 +112,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
           </div>
 
           {/* First row: Real Range, Battery, Charging Time, Efficiency, Battery Type */}
-          <div className="mt-2 grid grid-cols-5 gap-1 text-xs">
+          <div className={specGridClassName}>
             <VehicleSpecItem 
               label="Real Range" 
               value={vehicle.realWorldRange ? `${vehicle.realWorldRange} km` : "N/A"} 
@@ -125,7 +136,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
           </div>
 
           {/* Second row: Power, Torque, 0-100 km/h, Top Speed, Weight */}
-          <div className="mt-2 grid grid-cols-5 gap-1 text-xs">
+          <div className={specGridClassName}>
             <VehicleSpecItem 
               label="Power" 
               value={vehicle.horsepower ? `${vehicle.horsepower} BHP` : "N/A"} 

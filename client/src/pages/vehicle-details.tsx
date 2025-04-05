@@ -220,9 +220,9 @@ export default function VehicleDetails() {
 
             {/* Additional space for key specs */}
             <div className="mt-6">
-              <p className="text-sm text-gray-500">
+              {/* <p className="text-sm text-gray-500">
                 See the tabs below for detailed specifications about battery, charging, and more features.
-              </p>
+              </p> */}
             </div>
           </div>
         </div>

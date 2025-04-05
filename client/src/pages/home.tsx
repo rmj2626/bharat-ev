@@ -6,6 +6,7 @@ import VehicleCard from "@/components/vehicle-card";
 import Pagination from "@/components/pagination";
 import { useToast } from "@/hooks/use-toast";
 import { useUrlFilters } from "@/hooks/use-url-filters";
+import styles from "../components/desktop-styles.module.css";
 
 export default function Home() {
   const { toast } = useToast();
@@ -62,13 +63,21 @@ export default function Home() {
     }
   }, [isError, toast]);
 
+  // Use matchMedia for more reliable screen size detection
+  const isDesktop = typeof window !== 'undefined' && window.matchMedia("(min-width: 1280px)").matches;
+  
+  // Apply desktop container class only on desktop screens
+  const containerClassName = isDesktop 
+    ? `w-full px-4 md:w-3/5 mx-auto py-8 ${styles.desktopContainer}` 
+    : "w-full px-4 md:w-3/5 mx-auto py-8";
+
   return (
-    <main className="w-full px-4 md:w-3/5 mx-auto py-8" style={{ maxWidth: '1280px' }}>
+    <main className={containerClassName}>
       {/* Page Title */}
       <div className="border-b border-border pb-5 mb-6">
         <h1 className="text-3xl font-medium leading-tight text-primary font-styreneB">All Electric Vehicles in India</h1>
         <p className="mt-2 text-base text-muted-foreground font-tiempos">
-          Browse, filter, and compare detailed specifications of all EVs available in the Indian market
+          Browse, filter, estimate range and compare detailed specifications of all EVs available in the Indian market!
         </p>
       </div>
 

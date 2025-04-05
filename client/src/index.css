@@ -1,6 +1,7 @@
 /* stylelint-disable */
 @import "./styles/theme.css";
 @import "./styles/fonts.css";
+@import "./styles/desktop.css";
 
 @tailwind base;
 @tailwind components;
